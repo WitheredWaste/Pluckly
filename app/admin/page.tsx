@@ -34,7 +34,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [queue, setQueue] = useState<Draft[]>([{ ...BLANK }]);
-  const [priceList, setPriceList] = useState
+  const [priceList, setPriceList] = useState<
     { name: string; slug: string; priceCheckedAt: string | null; publishedAt: string | null }[] | null
   >(null);
 
