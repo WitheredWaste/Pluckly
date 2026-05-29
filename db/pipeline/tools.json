@@ -1,0 +1,47 @@
+[
+  {
+    "name": "CapCut",
+    "slug": "capcut",
+    "tagline": "Free video editing for short-form creators.",
+    "description": "CapCut is ByteDance's free video editor built around short-form content workflows. It handles trimming, captions, transitions, and green screen in a mobile-first interface that also runs in the browser. Widely used by TikTok and Reels creators for its auto-caption and template features.",
+    "websiteUrl": "https://www.capcut.com",
+    "affiliateUrl": null,
+    "foundedYear": 2020,
+    "pricingModel": "freemium",
+    "startingPriceCents": 0,
+    "hasFreeOption": true,
+    "isOpenSource": false,
+    "categories": ["video-editing"],
+    "creatorTypes": ["youtuber", "streamer"]
+  },
+  {
+    "name": "Canva",
+    "slug": "canva",
+    "tagline": "Design tool for thumbnails, graphics, and social posts.",
+    "description": "Canva is a browser-based design tool with a large library of templates covering thumbnails, social media graphics, presentations, and short-form video. The free tier is genuinely usable; the Pro plan adds background removal, brand kits, and a content scheduler. Dominant in the creator space as a Photoshop alternative that requires no design training.",
+    "websiteUrl": "https://www.canva.com",
+    "affiliateUrl": null,
+    "foundedYear": 2013,
+    "pricingModel": "freemium",
+    "startingPriceCents": 1500,
+    "hasFreeOption": true,
+    "isOpenSource": false,
+    "categories": ["thumbnails-visuals"],
+    "creatorTypes": ["youtuber", "newsletter-writer", "course-creator"]
+  },
+  {
+    "name": "Buffer",
+    "slug": "buffer",
+    "tagline": "Social media scheduling for independent creators.",
+    "description": "Buffer schedules posts across Instagram, TikTok, YouTube, LinkedIn, and X from a single queue. The free plan covers three channels, which covers most solo creators. Analytics show reach, engagement, and best posting times. Straightforward compared to enterprise tools like Hootsuite.",
+    "websiteUrl": "https://buffer.com",
+    "affiliateUrl": null,
+    "foundedYear": 2010,
+    "pricingModel": "freemium",
+    "startingPriceCents": 600,
+    "hasFreeOption": true,
+    "isOpenSource": false,
+    "categories": ["scheduling"],
+    "creatorTypes": ["youtuber", "newsletter-writer", "streamer"]
+  }
+]
