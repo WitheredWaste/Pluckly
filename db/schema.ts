@@ -42,6 +42,7 @@ export const tools = pgTable("tools", {
   hasFreeTier: boolean("has_free_tier").default(false).notNull(),
   hasFreeTrial: boolean("has_free_trial").default(false).notNull(),
   publishedAt: timestamp("published_at"),
+  priceCheckedAt: timestamp("price_checked_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
