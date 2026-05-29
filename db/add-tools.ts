@@ -28,6 +28,7 @@ async function run() {
     if (existing.length) { console.log(`• skip (exists): ${t.slug}`); continue; }
 
     const [row] = await db.insert(tools).values({
+      publishedAt: new Date(),
       name: t.name, slug: t.slug, tagline: t.tagline,
       description: t.description, websiteUrl: t.websiteUrl,
       affiliateUrl: t.affiliateUrl ?? null,
