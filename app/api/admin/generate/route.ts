@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Tool name is required." }, { status: 400 });
   }
 
-  let validSlugs = [];
+  let validSlugs: string[] = [];
   try {
     const rows = await db.select({ slug: categories.slug }).from(categories);
     validSlugs = rows.map((r) => r.slug);

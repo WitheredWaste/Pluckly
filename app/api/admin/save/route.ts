@@ -62,7 +62,7 @@ export async function POST(request: Request) {
     }
 
     const allCats = await db.select().from(categories);
-    const unknown = [];
+    const unknown: string[] = [];
     for (const cslug of categorySlugs || []) {
       const cat = allCats.find((c) => c.slug === cslug);
       if (cat) {
