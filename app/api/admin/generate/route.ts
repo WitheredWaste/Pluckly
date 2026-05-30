@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { db } from "@/db/index";
+import { categories } from "@/db/schema";
 
 const VOICE_RULES = `
 You are writing for Pluckly, a directory of tools for online creators.
@@ -10,7 +12,7 @@ No em-dashes. No exclamation marks. No "allows you to".
 Never call a tool "the best" or "#1".
 `;
 
-export async function POST(request: Request) {
+export async function POST(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const sentPassword = request.headers.get("x-admin-password");
   if (!adminPassword || sentPassword !== adminPassword) {
@@ -18,10 +20,18 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { name, websiteUrl, roughPrice, hasFreeOption, categories } = body;
+  const { name, websiteUrl, roughPrice, hasFreeOption } = body;
 
   if (!name) {
     return NextResponse.json({ error: "Tool name is required." }, { status: 400 });
+  }
+
+  let validSlugs = [];
+  try {
+    const rows = await db.select({ slug: categories.slug }).from(categories);
+    validSlugs = rows.map((r) => r.slug);
+  } catch {
+    validSlugs = [];
   }
 
   const userPrompt = `Write Pluckly content for this tool.
@@ -30,13 +40,16 @@ Tool name: ${name}
 Website: ${websiteUrl || "unknown"}
 Rough price the user provided: ${roughPrice || "unknown"}
 Has a free option: ${hasFreeOption ? "yes" : "no"}
-Categories it fits: ${(categories || []).join(", ") || "unknown"}
 
-Return ONLY a JSON object, no other text, no markdown fences, in exactly this shape:
+Choose the most relevant categories for this tool from EXACTLY this list of valid slugs (do not invent new ones):
+${validSlugs.join(", ") || "none available"}
+
+Pick 1 to 3 that genuinely fit. Return ONLY a JSON object, no other text, no markdown fences, in exactly this shape:
 {
   "tagline": "...",
   "description": "...",
   "suggestedSlug": "lowercase-hyphenated-version-of-name",
+  "suggestedCategories": ["slug-one", "slug-two"],
   "priceNote": "A short reminder of what price figure to verify before publishing."
 }`;
 
@@ -59,13 +72,13 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
     const data = await apiResponse.json();
 
     if (!apiResponse.ok) {
-      const msg = data?.error?.message || "Claude API error.";
+      const msg = (data && data.error && data.error.message) || "Claude API error.";
       return NextResponse.json({ error: msg }, { status: 502 });
     }
 
     const rawText = (data.content || [])
-      .filter((b: { type: string }) => b.type === "text")
-      .map((b: { text: string }) => b.text)
+      .filter((b) => b.type === "text")
+      .map((b) => b.text)
       .join("")
       .trim();
 
@@ -75,10 +88,11 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
     try {
       parsed = JSON.parse(cleaned);
     } catch {
-      return NextResponse.json(
-        { error: "Claude did not return clean JSON. Try Generate again." },
-        { status: 502 }
-      );
+      return NextResponse.json({ error: "Claude did not return clean JSON. Try Generate again." }, { status: 502 });
+    }
+
+    if (Array.isArray(parsed.suggestedCategories) && validSlugs.length) {
+      parsed.suggestedCategories = parsed.suggestedCategories.filter((s) => validSlugs.includes(s));
     }
 
     return NextResponse.json(parsed);

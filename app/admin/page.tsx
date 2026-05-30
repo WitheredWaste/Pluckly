@@ -88,11 +88,13 @@ export default function AdminPage() {
         update(i, { status: data.error || "Error generating." });
         return;
       }
+      const suggested = Array.isArray(data.suggestedCategories) ? data.suggestedCategories.join(", ") : d.categories;
       update(i, {
         tagline: data.tagline || "",
         description: data.description || "",
         slug: data.suggestedSlug || "",
         priceNote: data.priceNote || "",
+        categories: d.categories.trim() ? d.categories : suggested,
         status: "ready",
       });
     } catch {
@@ -125,6 +127,7 @@ export default function AdminPage() {
         return;
       }
       let msg = mode === "publish" ? "Published and live." : "Saved as draft.";
+      if (data.wasUpdate) { msg = mode === "publish" ? "Updated and published live." : "Draft updated."; }
       if (data.unknownCategories && data.unknownCategories.length) {
         msg += " Unknown categories skipped: " + data.unknownCategories.join(", ");
       }
@@ -186,7 +189,7 @@ export default function AdminPage() {
             const stale = d === null || d >= 90;
             return (
               <div key={t.slug} style={S.priceRow}>
-                <span>{t.name}</span>
+                <span>{t.name}{!t.publishedAt && <span style={{marginLeft:8,fontSize:11,fontWeight:700,color:"#fff",background:"#a8a29e",padding:"1px 6px",borderRadius:2}}>DRAFT</span>}</span>
                 <span style={{ color: stale ? "#b45309" : "#78716c", fontWeight: stale ? 700 : 400 }}>
                   {d === null ? "never checked" : `${d} days ago`}
                   {stale ? "  \u26a0 re-check" : ""}
