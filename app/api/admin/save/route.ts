@@ -5,10 +5,19 @@ import { eq } from "drizzle-orm";
 
 type CategoryRow = { id: number; slug: string };
 
-function toCents(value: unknown): number | null {
+function toCentsFromDollars(value: unknown): number | null {
   if (value === "" || value == null) return null;
   const n = Number(value);
-  return Number.isFinite(n) ? n : null;
+  if (!Number.isFinite(n)) return null;
+  return Math.round(n * 100);
+}
+
+const ALLOWED_CURRENCIES = ["USD", "EUR", "GBP"];
+const ALLOWED_PRICING = ["freemium", "subscription", "free", "one-time", "paid"];
+
+function cleanEnum(value: unknown, allowed: string[], fallback: string | null): string | null {
+  if (typeof value === "string" && allowed.includes(value)) return value;
+  return fallback;
 }
 
 function cleanText(value: unknown): string | null {
@@ -31,7 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request data." }, { status: 400 });
   }
 
-  const { name, slug, tagline, description, websiteUrl, startingPriceCents, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases } = body;
+  const { name, slug, tagline, description, websiteUrl, startingPriceDollars, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases, pricingModel, currency } = body;
 
   if (!name || !slug) {
     return NextResponse.json({ error: "Name and slug are required." }, { status: 400 });
@@ -46,7 +55,9 @@ export async function POST(request: Request) {
       tagline: cleanText(tagline),
       description: cleanText(description),
       websiteUrl: cleanText(websiteUrl),
-      startingPriceCents: toCents(startingPriceCents),
+      startingPriceCents: toCentsFromDollars(startingPriceDollars),
+      pricingModel: cleanEnum(pricingModel, ALLOWED_PRICING, null),
+      currency: cleanEnum(currency, ALLOWED_CURRENCIES, "USD"),
       hasFreeTier: !!hasFreeOption,
       pros: cleanText(pros),
       cons: cleanText(cons),

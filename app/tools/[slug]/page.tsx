@@ -44,10 +44,13 @@ export async function generateMetadata({
 
 export const revalidate = 60;
 
-function formatPrice(cents: number | null): string {
+const CURRENCY_SYMBOLS: Record<string, string> = { USD: "$", EUR: "€", GBP: "£" };
+
+function formatPrice(cents: number | null, currency: string | null): string {
   if (cents === null) return "Pricing varies";
   if (cents === 0) return "Free";
-  return `From $${(cents / 100).toFixed(0)}/mo`;
+  const symbol = CURRENCY_SYMBOLS[currency ?? "USD"] ?? "$";
+  return `From ${symbol}${(cents / 100).toFixed(0)}/mo`;
 }
 
 function freeStatus(hasFreeTier: boolean, hasFreeTrial: boolean): string {
@@ -111,7 +114,7 @@ export default async function ToolPage({ params }: PageProps) {
           "offers": {
             "@type": "Offer",
             "price": tool.startingPriceCents ? (tool.startingPriceCents / 100).toString() : "0",
-            "priceCurrency": "USD",
+            "priceCurrency": tool.currency ?? "USD",
           },
         }}
       />
@@ -138,7 +141,7 @@ export default async function ToolPage({ params }: PageProps) {
             Starting price
           </div>
           <div className="mt-1 text-sm">
-            {formatPrice(tool.startingPriceCents)}
+            {formatPrice(tool.startingPriceCents, tool.currency)}
           </div>
         </div>
         {tool.foundedYear && (

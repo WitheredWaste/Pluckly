@@ -55,6 +55,8 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
   "description": "...",
   "suggestedSlug": "lowercase-hyphenated-version-of-name",
   "suggestedCategories": ["slug-one", "slug-two"],
+  "suggestedPricingModel": "one of: freemium, subscription, free, one-time, paid",
+  "suggestedCurrency": "one of: USD, EUR, GBP (the currency this tool actually prices in)",
   "pros": ["...", "..."],
   "cons": ["...", "..."],
   "features": ["...", "..."],

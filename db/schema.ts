@@ -47,6 +47,7 @@ export const tools = pgTable("tools", {
   cons: text("cons"),
   features: text("features"),
   useCases: text("use_cases"),
+  currency: text("currency").default("USD"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

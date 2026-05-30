@@ -12,7 +12,9 @@ type Draft = {
   description: string;
   slug: string;
   priceNote: string;
-  startingPriceCents: string;
+  startingPriceDollars: string;
+  pricingModel: string;
+  currency: string;
   pros: string;
   cons: string;
   features: string;
@@ -45,7 +47,9 @@ const BLANK: Draft = {
   description: "",
   slug: "",
   priceNote: "",
-  startingPriceCents: "",
+  startingPriceDollars: "",
+  pricingModel: "",
+  currency: "USD",
   pros: "",
   cons: "",
   features: "",
@@ -116,7 +120,9 @@ export default function AdminPage() {
           description: t.description,
           slug: t.slug,
           priceNote: "",
-          startingPriceCents: t.startingPriceCents,
+          startingPriceDollars: t.startingPriceDollars,
+          pricingModel: t.pricingModel || "",
+          currency: t.currency || "USD",
           pros: t.pros || "",
           cons: t.cons || "",
           features: t.features || "",
@@ -178,6 +184,8 @@ export default function AdminPage() {
         slug: data.suggestedSlug || "",
         priceNote: data.priceNote || "",
         categories: d.categories.trim() ? d.categories : suggested,
+        pricingModel: data.suggestedPricingModel || d.pricingModel,
+        currency: data.suggestedCurrency || d.currency,
         pros: data.pros || "",
         cons: data.cons || "",
         features: data.features || "",
@@ -202,8 +210,10 @@ export default function AdminPage() {
           tagline: d.tagline,
           description: d.description,
           websiteUrl: d.websiteUrl,
-          startingPriceCents: d.startingPriceCents,
+          startingPriceDollars: d.startingPriceDollars,
           hasFreeOption: d.hasFreeOption,
+          pricingModel: d.pricingModel,
+          currency: d.currency,
           categorySlugs: d.categories.split(",").map((s) => s.trim()).filter(Boolean),
           pros: d.pros,
           cons: d.cons,
@@ -335,8 +345,25 @@ export default function AdminPage() {
 
                     {d.priceNote && <p style={S.priceNote}>Price check: {d.priceNote}</p>}
 
-                    <label style={S.label}>Verified price in cents (e.g. 1500 for $15.00 — leave blank if none)</label>
-                    <input style={S.input} value={d.startingPriceCents} onChange={(e) => update(i, { startingPriceCents: e.target.value })} />
+                    <label style={S.label}>Starting price in dollars (e.g. 72 for $72 — leave blank if none)</label>
+                    <input style={S.input} value={d.startingPriceDollars} onChange={(e) => update(i, { startingPriceDollars: e.target.value })} />
+
+                    <label style={S.label}>Currency</label>
+                    <select style={S.input} value={d.currency} onChange={(e) => update(i, { currency: e.target.value })}>
+                      <option value="USD">USD ($)</option>
+                      <option value="EUR">EUR (€)</option>
+                      <option value="GBP">GBP (£)</option>
+                    </select>
+
+                    <label style={S.label}>Pricing model</label>
+                    <select style={S.input} value={d.pricingModel} onChange={(e) => update(i, { pricingModel: e.target.value })}>
+                      <option value="">(none)</option>
+                      <option value="freemium">Freemium</option>
+                      <option value="subscription">Subscription</option>
+                      <option value="free">Free</option>
+                      <option value="one-time">One-time</option>
+                      <option value="paid">Paid</option>
+                    </select>
 
                     <label style={S.label}>Pros (one per line)</label>
                     <textarea style={S.textarea} value={d.pros} onChange={(e) => update(i, { pros: e.target.value })} />
