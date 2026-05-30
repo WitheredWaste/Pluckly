@@ -56,6 +56,14 @@ function freeStatus(hasFreeTier: boolean, hasFreeTrial: boolean): string {
   return "Paid only";
 }
 
+function toLines(value: string | null): string[] {
+  if (!value) return [];
+  return value
+    .split("\n")
+    .map((l) => l.replace(/^[-*•\s]+/, "").trim())
+    .filter(Boolean);
+}
+
 export default async function ToolPage({ params }: PageProps) {
   const { slug } = await params;
 
@@ -83,6 +91,11 @@ export default async function ToolPage({ params }: PageProps) {
       eq(toolCreatorTypes.creatorTypeId, creatorTypes.id)
     )
     .where(eq(toolCreatorTypes.toolId, tool.id));
+
+  const features = toLines(tool.features);
+  const pros = toLines(tool.pros);
+  const cons = toLines(tool.cons);
+  const useCases = toLines(tool.useCases);
 
   return (
     <article className="max-w-3xl mx-auto px-6 py-16">
@@ -152,7 +165,7 @@ export default async function ToolPage({ params }: PageProps) {
         </div>
         {tool.websiteUrl && (
           <div className="ml-auto">
-            <a
+            
               href={tool.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -170,6 +183,68 @@ export default async function ToolPage({ params }: PageProps) {
           <p className="mt-4 text-foreground/90 leading-relaxed">
             {tool.description}
           </p>
+        </section>
+      )}
+
+      {features.length > 0 && (
+        <section className="mt-12">
+          <h2 className="font-serif text-2xl">Key features</h2>
+          <ul className="mt-4 space-y-2">
+            {features.map((f, i) => (
+              <li key={i} className="flex gap-3 text-foreground/90 leading-relaxed">
+                <span className="text-accent mt-1">–</span>
+                <span>{f}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {(pros.length > 0 || cons.length > 0) && (
+        <section className="mt-12">
+          <h2 className="font-serif text-2xl">Pros and cons</h2>
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {pros.length > 0 && (
+              <div>
+                <h3 className="text-sm uppercase tracking-wide text-muted">Pros</h3>
+                <ul className="mt-3 space-y-2">
+                  {pros.map((p, i) => (
+                    <li key={i} className="flex gap-2 text-foreground/90 leading-relaxed">
+                      <span className="text-accent mt-1">+</span>
+                      <span>{p}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {cons.length > 0 && (
+              <div>
+                <h3 className="text-sm uppercase tracking-wide text-muted">Cons</h3>
+                <ul className="mt-3 space-y-2">
+                  {cons.map((c, i) => (
+                    <li key={i} className="flex gap-2 text-foreground/90 leading-relaxed">
+                      <span className="text-muted mt-1">–</span>
+                      <span>{c}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {useCases.length > 0 && (
+        <section className="mt-12">
+          <h2 className="font-serif text-2xl">Who it&apos;s for</h2>
+          <ul className="mt-4 space-y-2">
+            {useCases.map((u, i) => (
+              <li key={i} className="flex gap-3 text-foreground/90 leading-relaxed">
+                <span className="text-accent mt-1">–</span>
+                <span>{u}</span>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 
