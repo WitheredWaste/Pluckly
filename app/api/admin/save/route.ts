@@ -3,7 +3,9 @@ import { db } from "@/db/index";
 import { tools, categories, toolCategories } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-function toCents(value: unknown) {
+type CategoryRow = { id: number; slug: string };
+
+function toCents(value: unknown): number | null {
   if (value === "" || value == null) return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
@@ -31,7 +33,7 @@ export async function POST(request: Request) {
 
   try {
     const existing = await db.select({ id: tools.id }).from(tools).where(eq(tools.slug, slug));
-    let toolId;
+    let toolId: number;
     let wasUpdate = false;
     const fields = {
       name,
@@ -61,10 +63,10 @@ export async function POST(request: Request) {
       toolId = row.id;
     }
 
-    const allCats = await db.select().from(categories);
+    const allCats: CategoryRow[] = await db.select().from(categories);
     const unknown: string[] = [];
-    for (const cslug of categorySlugs || []) {
-      const cat = allCats.find((c) => c.slug === cslug);
+    for (const cslug of (categorySlugs || []) as string[]) {
+      const cat = allCats.find((c: CategoryRow) => c.slug === cslug);
       if (cat) {
         await db.insert(toolCategories).values({ toolId, categoryId: cat.id });
       } else {

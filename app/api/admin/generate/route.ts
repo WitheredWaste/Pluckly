@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/db/index";
 import { categories } from "@/db/schema";
 
+type ContentBlock = { type: string; text?: string };
+
 const VOICE_RULES = `
 You are writing for Pluckly, a directory of tools for online creators.
 Voice: direct, factual, present tense, Wirecutter meets Stratechery.
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
   let validSlugs: string[] = [];
   try {
     const rows = await db.select({ slug: categories.slug }).from(categories);
-    validSlugs = rows.map((r) => r.slug);
+    validSlugs = rows.map((r: { slug: string }) => r.slug);
   } catch {
     validSlugs = [];
   }
@@ -76,9 +78,9 @@ Pick 1 to 3 that genuinely fit. Return ONLY a JSON object, no other text, no mar
       return NextResponse.json({ error: msg }, { status: 502 });
     }
 
-    const rawText = (data.content || [])
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
+    const rawText = ((data.content || []) as ContentBlock[])
+      .filter((b: ContentBlock) => b.type === "text")
+      .map((b: ContentBlock) => b.text || "")
       .join("")
       .trim();
 
@@ -92,7 +94,7 @@ Pick 1 to 3 that genuinely fit. Return ONLY a JSON object, no other text, no mar
     }
 
     if (Array.isArray(parsed.suggestedCategories) && validSlugs.length) {
-      parsed.suggestedCategories = parsed.suggestedCategories.filter((s) => validSlugs.includes(s));
+      parsed.suggestedCategories = parsed.suggestedCategories.filter((s: string) => validSlugs.includes(s));
     }
 
     return NextResponse.json(parsed);
