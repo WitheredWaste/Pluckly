@@ -50,7 +50,9 @@ function formatPrice(cents: number | null, currency: string | null): string {
   if (cents === null) return "Pricing varies";
   if (cents === 0) return "Free";
   const symbol = CURRENCY_SYMBOLS[currency ?? "USD"] ?? "$";
-  return `From ${symbol}${(cents / 100).toFixed(0)}/mo`;
+  const dollars = cents / 100;
+  const display = dollars % 1 === 0 ? dollars.toString() : dollars.toFixed(2);
+  return `From ${symbol}${display}/mo`;
 }
 
 function freeStatus(hasFreeTier: boolean, hasFreeTrial: boolean): string {
