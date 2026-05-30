@@ -12,7 +12,7 @@ No em-dashes. No exclamation marks. No "allows you to".
 Never call a tool "the best" or "#1".
 `;
 
-export async function POST(request) {
+export async function POST(request: Request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const sentPassword = request.headers.get("x-admin-password");
   if (!adminPassword || sentPassword !== adminPassword) {

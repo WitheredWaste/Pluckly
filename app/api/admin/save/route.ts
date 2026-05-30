@@ -3,13 +3,13 @@ import { db } from "@/db/index";
 import { tools, categories, toolCategories } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-function toCents(value) {
+function toCents(value: unknown) {
   if (value === "" || value == null) return null;
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 }
 
-export async function POST(request) {
+export async function POST(request: Request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const sentPassword = request.headers.get("x-admin-password");
   if (!adminPassword || sentPassword !== adminPassword) {
