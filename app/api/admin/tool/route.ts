@@ -47,6 +47,10 @@ export async function POST(request: Request) {
       startingPriceCents: tool.startingPriceCents == null ? "" : String(tool.startingPriceCents),
       hasFreeOption: !!tool.hasFreeTier,
       categories: catSlugs.join(", "),
+      pros: tool.pros || "",
+      cons: tool.cons || "",
+      features: tool.features || "",
+      useCases: tool.useCases || "",
       isPublished: !!tool.publishedAt,
     },
   });

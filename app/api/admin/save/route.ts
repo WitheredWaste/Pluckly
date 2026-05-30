@@ -11,6 +11,12 @@ function toCents(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function cleanText(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const t = value.trim();
+  return t === "" ? null : t;
+}
+
 export async function POST(request: Request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const sentPassword = request.headers.get("x-admin-password");
@@ -25,7 +31,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request data." }, { status: 400 });
   }
 
-  const { name, slug, tagline, description, websiteUrl, startingPriceCents, hasFreeOption, categorySlugs, mode } = body;
+  const { name, slug, tagline, description, websiteUrl, startingPriceCents, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases } = body;
 
   if (!name || !slug) {
     return NextResponse.json({ error: "Name and slug are required." }, { status: 400 });
@@ -37,11 +43,15 @@ export async function POST(request: Request) {
     let wasUpdate = false;
     const fields = {
       name,
-      tagline: tagline || null,
-      description: description || null,
-      websiteUrl: websiteUrl || null,
+      tagline: cleanText(tagline),
+      description: cleanText(description),
+      websiteUrl: cleanText(websiteUrl),
       startingPriceCents: toCents(startingPriceCents),
       hasFreeTier: !!hasFreeOption,
+      pros: cleanText(pros),
+      cons: cleanText(cons),
+      features: cleanText(features),
+      useCases: cleanText(useCases),
       priceCheckedAt: new Date(),
     };
 

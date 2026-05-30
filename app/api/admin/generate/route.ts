@@ -9,9 +9,10 @@ You are writing for Pluckly, a directory of tools for online creators.
 Voice: direct, factual, present tense, Wirecutter meets Stratechery.
 - Tagline: 6-10 words, declarative.
 - Description: 2-4 sentences, 50-90 words. Cover what it does, who uses it, and one honest observation.
+- Pros, cons, features, useCases: each is a list. Each item is a short phrase or one sentence, no leading bullet characters.
 Forbidden words: leading, powerful, robust, seamless, cutting-edge, revolutionary, best-in-class.
 No em-dashes. No exclamation marks. No "allows you to".
-Never call a tool "the best" or "#1".
+Never call a tool "the best" or "#1". Be honest in cons; real tools have real weaknesses.
 `;
 
 export async function POST(request: Request) {
@@ -46,12 +47,18 @@ Has a free option: ${hasFreeOption ? "yes" : "no"}
 Choose the most relevant categories for this tool from EXACTLY this list of valid slugs (do not invent new ones):
 ${validSlugs.join(", ") || "none available"}
 
-Pick 1 to 3 that genuinely fit. Return ONLY a JSON object, no other text, no markdown fences, in exactly this shape:
+For pros, cons, features, and useCases: provide up to 6-8 items each where genuinely useful (fewer is fine if padding would be filler). Each item a short phrase or single sentence.
+
+Return ONLY a JSON object, no other text, no markdown fences, in exactly this shape:
 {
   "tagline": "...",
   "description": "...",
   "suggestedSlug": "lowercase-hyphenated-version-of-name",
   "suggestedCategories": ["slug-one", "slug-two"],
+  "pros": ["...", "..."],
+  "cons": ["...", "..."],
+  "features": ["...", "..."],
+  "useCases": ["...", "..."],
   "priceNote": "A short reminder of what price figure to verify before publishing."
 }`;
 
@@ -65,7 +72,7 @@ Pick 1 to 3 that genuinely fit. Return ONLY a JSON object, no other text, no mar
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 1000,
+        max_tokens: 2000,
         system: VOICE_RULES,
         messages: [{ role: "user", content: userPrompt }],
       }),
@@ -96,6 +103,13 @@ Pick 1 to 3 that genuinely fit. Return ONLY a JSON object, no other text, no mar
     if (Array.isArray(parsed.suggestedCategories) && validSlugs.length) {
       parsed.suggestedCategories = parsed.suggestedCategories.filter((s: string) => validSlugs.includes(s));
     }
+
+    const toLines = (v: unknown): string =>
+      Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean).join("\n") : "";
+    parsed.pros = toLines(parsed.pros);
+    parsed.cons = toLines(parsed.cons);
+    parsed.features = toLines(parsed.features);
+    parsed.useCases = toLines(parsed.useCases);
 
     return NextResponse.json(parsed);
   } catch {

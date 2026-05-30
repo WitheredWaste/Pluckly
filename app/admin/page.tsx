@@ -13,6 +13,10 @@ type Draft = {
   slug: string;
   priceNote: string;
   startingPriceCents: string;
+  pros: string;
+  cons: string;
+  features: string;
+  useCases: string;
   status: string;
 };
 
@@ -42,6 +46,10 @@ const BLANK: Draft = {
   slug: "",
   priceNote: "",
   startingPriceCents: "",
+  pros: "",
+  cons: "",
+  features: "",
+  useCases: "",
   status: "",
 };
 
@@ -109,6 +117,10 @@ export default function AdminPage() {
           slug: t.slug,
           priceNote: "",
           startingPriceCents: t.startingPriceCents,
+          pros: t.pros || "",
+          cons: t.cons || "",
+          features: t.features || "",
+          useCases: t.useCases || "",
           status: t.isPublished ? "Editing a published tool." : "Editing a draft.",
         };
         setQueue([loaded]);
@@ -166,6 +178,10 @@ export default function AdminPage() {
         slug: data.suggestedSlug || "",
         priceNote: data.priceNote || "",
         categories: d.categories.trim() ? d.categories : suggested,
+        pros: data.pros || "",
+        cons: data.cons || "",
+        features: data.features || "",
+        useCases: data.useCases || "",
         status: "ready",
       });
     } catch {
@@ -189,6 +205,10 @@ export default function AdminPage() {
           startingPriceCents: d.startingPriceCents,
           hasFreeOption: d.hasFreeOption,
           categorySlugs: d.categories.split(",").map((s) => s.trim()).filter(Boolean),
+          pros: d.pros,
+          cons: d.cons,
+          features: d.features,
+          useCases: d.useCases,
           mode,
         }),
       });
@@ -317,6 +337,18 @@ export default function AdminPage() {
 
                     <label style={S.label}>Verified price in cents (e.g. 1500 for $15.00 — leave blank if none)</label>
                     <input style={S.input} value={d.startingPriceCents} onChange={(e) => update(i, { startingPriceCents: e.target.value })} />
+
+                    <label style={S.label}>Pros (one per line)</label>
+                    <textarea style={S.textarea} value={d.pros} onChange={(e) => update(i, { pros: e.target.value })} />
+
+                    <label style={S.label}>Cons (one per line)</label>
+                    <textarea style={S.textarea} value={d.cons} onChange={(e) => update(i, { cons: e.target.value })} />
+
+                    <label style={S.label}>Key features (one per line)</label>
+                    <textarea style={S.textarea} value={d.features} onChange={(e) => update(i, { features: e.target.value })} />
+
+                    <label style={S.label}>Use cases / who it's for (one per line)</label>
+                    <textarea style={S.textarea} value={d.useCases} onChange={(e) => update(i, { useCases: e.target.value })} />
 
                     <div style={S.btnRow}>
                       <button style={S.secondary} onClick={() => save(i, "draft")}>Save as draft</button>
