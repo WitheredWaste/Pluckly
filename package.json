@@ -13,6 +13,7 @@
     "db:add-tools": "npx tsx --env-file .env.local db/add-tools.ts"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.16.0",
