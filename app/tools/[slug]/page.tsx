@@ -165,7 +165,7 @@ export default async function ToolPage({ params }: PageProps) {
         </div>
         {tool.websiteUrl && (
           <div className="ml-auto">
-            
+            <a
               href={tool.websiteUrl}
               target="_blank"
               rel="noopener noreferrer"
