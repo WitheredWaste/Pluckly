@@ -185,7 +185,7 @@ export default async function ToolPage({ params }: PageProps) {
           </div>
         </div>
         {tool.websiteUrl && (
-          
+          <a
             href={tool.websiteUrl}
             target="_blank"
             rel="noopener noreferrer"
