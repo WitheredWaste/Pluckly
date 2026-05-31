@@ -47,6 +47,16 @@ function formatPrice(cents: number | null): string {
   return `From $${display}/mo`;
 }
 
+function faviconFromUrl(websiteUrl: string | null): string | null {
+  if (!websiteUrl) return null;
+  try {
+    const u = new URL(websiteUrl.includes("://") ? websiteUrl : `https://${websiteUrl}`);
+    return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=128`;
+  } catch {
+    return null;
+  }
+}
+
 export default async function CategoryPage({ params }: PageProps) {
   const { slug } = await params;
 
@@ -105,7 +115,16 @@ export default async function CategoryPage({ params }: PageProps) {
               className="block py-6 hover:bg-foreground/[0.02] transition-colors -mx-6 px-6"
             >
               <div className="flex items-baseline justify-between gap-4">
-                <h2 className="font-serif text-xl">{tool.name}</h2>
+                <div className="flex items-center gap-3 min-w-0">
+                  {(tool.logoUrl || faviconFromUrl(tool.websiteUrl)) && (
+                    <img
+                      src={tool.logoUrl || faviconFromUrl(tool.websiteUrl) || ""}
+                      alt=""
+                      className="w-6 h-6 rounded border border-border bg-card object-contain shrink-0"
+                    />
+                  )}
+                  <h2 className="font-serif text-xl truncate">{tool.name}</h2>
+                </div>
                 <span className="text-sm text-muted shrink-0">
                   {formatPrice(tool.startingPriceCents)}
                 </span>
