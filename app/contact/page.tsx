@@ -18,10 +18,10 @@ export default function ContactPage() {
         </p>
         <p className="font-serif text-xl">
             <a
-            href="mailto:hello@pluckly.net"
+            href="mailto:support@pluckly.net"
             className="text-accent hover:underline"
           >
-            hello@pluckly.net
+            support@pluckly.net
           </a>
         </p>
         <p className="text-muted text-sm">
