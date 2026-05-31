@@ -9,6 +9,12 @@
   --border: #E7E5E4;
   --muted: #57534E;
   --card: #FFFFFF;
+  --pros-bg: #E1F5EE;
+  --pros-border: #5DCAA5;
+  --pros-text: #085041;
+  --cons-bg: #FCEBEB;
+  --cons-border: #F09595;
+  --cons-text: #791F1F;
 }
 
 .dark {
@@ -17,6 +23,12 @@
   --border: #292524;
   --muted: #A8A29E;
   --card: #161616;
+  --pros-bg: #172A23;
+  --pros-border: #2F5E4E;
+  --pros-text: #C5E8DB;
+  --cons-bg: #2B1818;
+  --cons-border: #5E3232;
+  --cons-text: #ECCACA;
 }
 
 @theme inline {
@@ -26,6 +38,12 @@
   --color-border: var(--border);
   --color-muted: var(--muted);
   --color-card: var(--card);
+  --color-pros-bg: var(--pros-bg);
+  --color-pros-border: var(--pros-border);
+  --color-pros-text: var(--pros-text);
+  --color-cons-bg: var(--cons-bg);
+  --color-cons-border: var(--cons-border);
+  --color-cons-text: var(--cons-text);
 
   --font-sans: var(--font-inter);
   --font-serif: var(--font-source-serif);

@@ -18,7 +18,7 @@ interface PageProps {
 
 export async function generateStaticParams() {
   const allTools = await db.select({ slug: tools.slug }).from(tools);
-  return allTools.map((t) => ({ slug: t.slug }));
+  return allTools.map((t: { slug: string }) => ({ slug: t.slug }));
 }
 
 export async function generateMetadata({
@@ -65,7 +65,7 @@ function toLines(value: string | null): string[] {
   if (!value) return [];
   return value
     .split("\n")
-    .map((l) => l.replace(/^[-*•\s]+/, "").trim())
+    .map((l) => l.replace(/^[-*•+\s]+/, "").trim())
     .filter(Boolean);
 }
 
@@ -102,6 +102,8 @@ export default async function ToolPage({ params }: PageProps) {
   const cons = toLines(tool.cons);
   const useCases = toLines(tool.useCases);
 
+  const initial = (tool.name?.[0] ?? "?").toUpperCase();
+
   return (
     <article className="max-w-3xl mx-auto px-6 py-16">
       <JsonLd
@@ -128,57 +130,69 @@ export default async function ToolPage({ params }: PageProps) {
       </Link>
 
       <div className="mt-8">
-        <div className="text-sm text-muted uppercase tracking-wide">
+        <div className="text-sm text-accent uppercase tracking-wide">
           Tool review
         </div>
-        <h1 className="mt-2 font-serif text-5xl tracking-tight">{tool.name}</h1>
+        <div className="mt-3 flex items-center gap-4">
+          {tool.logoUrl ? (
+            <img
+              src={tool.logoUrl}
+              alt={`${tool.name} logo`}
+              className="w-12 h-12 rounded-md border border-border bg-card object-contain p-1"
+            />
+          ) : (
+            <div className="w-12 h-12 rounded-md border border-border bg-card flex items-center justify-center font-serif text-xl text-accent">
+              {initial}
+            </div>
+          )}
+          <h1 className="font-serif text-5xl tracking-tight">{tool.name}</h1>
+        </div>
         {tool.tagline && (
           <p className="mt-4 text-lg text-muted">{tool.tagline}</p>
         )}
+        <div className="mt-5 h-0.5 w-10 bg-accent" />
       </div>
 
-      <div className="mt-10 flex flex-wrap items-start gap-x-10 gap-y-4 pb-10 border-b border-border">
-        <div>
+      <div className="mt-8 flex flex-wrap items-stretch gap-3">
+        <div className="rounded-md border border-border bg-card px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wide">
             Starting price
           </div>
-          <div className="mt-1 text-sm">
+          <div className="mt-1 text-sm font-medium">
             {formatPrice(tool.startingPriceCents, tool.currency)}
           </div>
         </div>
         {tool.foundedYear && (
-          <div>
+          <div className="rounded-md border border-border bg-card px-4 py-3">
             <div className="text-xs text-muted uppercase tracking-wide">
               Founded
             </div>
-            <div className="mt-1 text-sm">{tool.foundedYear}</div>
+            <div className="mt-1 text-sm font-medium">{tool.foundedYear}</div>
           </div>
         )}
-        <div>
+        <div className="rounded-md border border-border bg-card px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wide">
             Pricing model
           </div>
-          <div className="mt-1 text-sm capitalize">{tool.pricingModel}</div>
+          <div className="mt-1 text-sm font-medium capitalize">{tool.pricingModel}</div>
         </div>
-        <div>
+        <div className="rounded-md border border-border bg-card px-4 py-3">
           <div className="text-xs text-muted uppercase tracking-wide">
             Free option
           </div>
-          <div className="mt-1 text-sm">
+          <div className="mt-1 text-sm font-medium">
             {freeStatus(tool.hasFreeTier, tool.hasFreeTrial)}
           </div>
         </div>
         {tool.websiteUrl && (
-          <div className="ml-auto">
-            <a
-              href={tool.websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm border border-border px-4 h-9 inline-flex items-center hover:bg-foreground/5 transition-colors"
-            >
-              Visit website
-            </a>
-          </div>
+          
+            href={tool.websiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto self-center text-sm border border-accent text-accent px-5 h-10 inline-flex items-center rounded-md hover:bg-accent hover:text-background transition-colors"
+          >
+            Visit website
+          </a>
         )}
       </div>
 
@@ -197,7 +211,7 @@ export default async function ToolPage({ params }: PageProps) {
           <ul className="mt-4 space-y-2">
             {features.map((f, i) => (
               <li key={i} className="flex gap-3 text-foreground/90 leading-relaxed">
-                <span className="text-accent mt-1">–</span>
+                <span className="text-accent mt-1.5 text-xs">●</span>
                 <span>{f}</span>
               </li>
             ))}
@@ -208,14 +222,14 @@ export default async function ToolPage({ params }: PageProps) {
       {(pros.length > 0 || cons.length > 0) && (
         <section className="mt-12">
           <h2 className="font-serif text-2xl">Pros and cons</h2>
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {pros.length > 0 && (
-              <div>
-                <h3 className="text-sm uppercase tracking-wide text-muted">Pros</h3>
+              <div className="rounded-md border border-pros-border bg-pros-bg p-4">
+                <h3 className="text-xs uppercase tracking-wide font-medium text-pros-text">Pros</h3>
                 <ul className="mt-3 space-y-2">
                   {pros.map((p, i) => (
-                    <li key={i} className="flex gap-2 text-foreground/90 leading-relaxed">
-                      <span className="text-accent mt-1">+</span>
+                    <li key={i} className="flex gap-2 text-pros-text leading-relaxed text-sm">
+                      <span className="mt-0.5">+</span>
                       <span>{p}</span>
                     </li>
                   ))}
@@ -223,12 +237,12 @@ export default async function ToolPage({ params }: PageProps) {
               </div>
             )}
             {cons.length > 0 && (
-              <div>
-                <h3 className="text-sm uppercase tracking-wide text-muted">Cons</h3>
+              <div className="rounded-md border border-cons-border bg-cons-bg p-4">
+                <h3 className="text-xs uppercase tracking-wide font-medium text-cons-text">Cons</h3>
                 <ul className="mt-3 space-y-2">
                   {cons.map((c, i) => (
-                    <li key={i} className="flex gap-2 text-foreground/90 leading-relaxed">
-                      <span className="text-muted mt-1">–</span>
+                    <li key={i} className="flex gap-2 text-cons-text leading-relaxed text-sm">
+                      <span className="mt-0.5">–</span>
                       <span>{c}</span>
                     </li>
                   ))}
@@ -245,7 +259,7 @@ export default async function ToolPage({ params }: PageProps) {
           <ul className="mt-4 space-y-2">
             {useCases.map((u, i) => (
               <li key={i} className="flex gap-3 text-foreground/90 leading-relaxed">
-                <span className="text-accent mt-1">–</span>
+                <span className="text-accent mt-1.5 text-xs">●</span>
                 <span>{u}</span>
               </li>
             ))}
@@ -257,11 +271,11 @@ export default async function ToolPage({ params }: PageProps) {
         <section className="mt-12">
           <h2 className="font-serif text-2xl">Categories</h2>
           <div className="mt-4 flex flex-wrap gap-2">
-            {toolCats.map(({ category }) => (
+            {toolCats.map(({ category }: { category: { id: number; slug: string; name: string } }) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="text-sm border border-border px-3 py-1 hover:bg-foreground/5 transition-colors"
+                className="text-sm border border-border px-3 py-1 rounded-md hover:bg-foreground/5 transition-colors"
               >
                 {category.name}
               </Link>
@@ -274,7 +288,7 @@ export default async function ToolPage({ params }: PageProps) {
         <section className="mt-12">
           <h2 className="font-serif text-2xl">Good for</h2>
           <p className="mt-4 text-foreground/90">
-            {toolCreators.map((tc, i) => (
+            {toolCreators.map((tc: { creatorType: { id: number; name: string } }, i: number) => (
               <span key={tc.creatorType.id}>
                 {i > 0 && ", "}
                 {tc.creatorType.name}s
