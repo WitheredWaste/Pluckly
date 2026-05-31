@@ -197,9 +197,9 @@ export default async function ToolPage({ params }: PageProps) {
         </div>
         {tool.websiteUrl && (
           <a
-            href={tool.websiteUrl}
+            href={tool.affiliateUrl || tool.websiteUrl || "#"}
             target="_blank"
-            rel="noopener noreferrer"
+            rel={tool.affiliateUrl ? "noopener noreferrer sponsored" : "noopener noreferrer"}
             className="ml-auto self-center text-sm border border-accent text-accent px-5 h-10 inline-flex items-center rounded-md hover:bg-accent hover:text-background transition-colors"
           >
             Visit website

@@ -6,6 +6,7 @@ type Draft = {
   name: string;
   websiteUrl: string;
   logoUrl: string;
+  affiliateUrl: string;
   roughPrice: string;
   hasFreeOption: boolean;
   categories: string;
@@ -42,6 +43,7 @@ const BLANK: Draft = {
   name: "",
   websiteUrl: "",
   logoUrl: "",
+  affiliateUrl: "",
   roughPrice: "",
   hasFreeOption: false,
   categories: "",
@@ -116,6 +118,7 @@ export default function AdminPage() {
           name: t.name,
           websiteUrl: t.websiteUrl,
           logoUrl: t.logoUrl || "",
+          affiliateUrl: t.affiliateUrl || "",
           roughPrice: "",
           hasFreeOption: t.hasFreeOption,
           categories: t.categories,
@@ -214,6 +217,7 @@ export default function AdminPage() {
           description: d.description,
           websiteUrl: d.websiteUrl,
           logoUrl: d.logoUrl,
+          affiliateUrl: d.affiliateUrl,
           startingPriceDollars: d.startingPriceDollars,
           hasFreeOption: d.hasFreeOption,
           pricingModel: d.pricingModel,
@@ -322,6 +326,8 @@ export default function AdminPage() {
                 <input style={S.input} value={d.websiteUrl} onChange={(e) => update(i, { websiteUrl: e.target.value })} />
                 <label style={S.label}>Logo URL (optional, auto from domain if blank)</label>
                 <input style={S.input} value={d.logoUrl} onChange={(e) => update(i, { logoUrl: e.target.value })} />
+                <label style={S.label}>Affiliate URL (optional, used for Visit button)</label>
+                <input style={S.input} value={d.affiliateUrl} onChange={(e) => update(i, { affiliateUrl: e.target.value })} />
 
                 <label style={S.label}>Rough price (e.g. &quot;$15/mo&quot;)</label>
                 <input style={S.input} value={d.roughPrice} onChange={(e) => update(i, { roughPrice: e.target.value })} />
