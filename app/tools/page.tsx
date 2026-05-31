@@ -14,7 +14,9 @@ export const revalidate = 60;
 function formatPrice(cents: number | null): string {
   if (cents === null) return "";
   if (cents === 0) return "Free";
-  return `From $${(cents / 100).toFixed(0)}/mo`;
+  const dollars = cents / 100;
+  const display = dollars % 1 === 0 ? dollars.toString() : dollars.toFixed(2);
+  return `From $${display}/mo`;
 }
 
 export default async function ToolsIndexPage() {
