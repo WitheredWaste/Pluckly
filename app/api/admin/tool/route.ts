@@ -44,6 +44,7 @@ export async function POST(request: Request) {
       tagline: tool.tagline || "",
       description: tool.description || "",
       websiteUrl: tool.websiteUrl || "",
+      logoUrl: tool.logoUrl || "",
       startingPriceDollars: tool.startingPriceCents == null ? "" : String(tool.startingPriceCents / 100),
       pricingModel: tool.pricingModel || "",
       currency: tool.currency || "USD",

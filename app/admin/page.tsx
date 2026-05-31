@@ -5,6 +5,7 @@ import { useState } from "react";
 type Draft = {
   name: string;
   websiteUrl: string;
+  logoUrl: string;
   roughPrice: string;
   hasFreeOption: boolean;
   categories: string;
@@ -40,6 +41,7 @@ type Stats = {
 const BLANK: Draft = {
   name: "",
   websiteUrl: "",
+  logoUrl: "",
   roughPrice: "",
   hasFreeOption: false,
   categories: "",
@@ -113,6 +115,7 @@ export default function AdminPage() {
         const loaded: Draft = {
           name: t.name,
           websiteUrl: t.websiteUrl,
+          logoUrl: t.logoUrl || "",
           roughPrice: "",
           hasFreeOption: t.hasFreeOption,
           categories: t.categories,
@@ -210,6 +213,7 @@ export default function AdminPage() {
           tagline: d.tagline,
           description: d.description,
           websiteUrl: d.websiteUrl,
+          logoUrl: d.logoUrl,
           startingPriceDollars: d.startingPriceDollars,
           hasFreeOption: d.hasFreeOption,
           pricingModel: d.pricingModel,
@@ -316,6 +320,8 @@ export default function AdminPage() {
 
                 <label style={S.label}>Website URL</label>
                 <input style={S.input} value={d.websiteUrl} onChange={(e) => update(i, { websiteUrl: e.target.value })} />
+                <label style={S.label}>Logo URL (optional, auto from domain if blank)</label>
+                <input style={S.input} value={d.logoUrl} onChange={(e) => update(i, { logoUrl: e.target.value })} />
 
                 <label style={S.label}>Rough price (e.g. &quot;$15/mo&quot;)</label>
                 <input style={S.input} value={d.roughPrice} onChange={(e) => update(i, { roughPrice: e.target.value })} />

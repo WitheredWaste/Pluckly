@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request data." }, { status: 400 });
   }
 
-  const { name, slug, tagline, description, websiteUrl, startingPriceDollars, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases, pricingModel, currency } = body;
+  const { name, slug, tagline, description, websiteUrl, logoUrl, startingPriceDollars, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases, pricingModel, currency } = body;
 
   if (!name || !slug) {
     return NextResponse.json({ error: "Name and slug are required." }, { status: 400 });
@@ -55,6 +55,7 @@ export async function POST(request: Request) {
       tagline: cleanText(tagline),
       description: cleanText(description),
       websiteUrl: cleanText(websiteUrl),
+      logoUrl: cleanText(logoUrl),
       startingPriceCents: toCentsFromDollars(startingPriceDollars),
       pricingModel: cleanEnum(pricingModel, ALLOWED_PRICING, null),
       currency: cleanEnum(currency, ALLOWED_CURRENCIES, "USD"),
