@@ -20,6 +20,9 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://pluckly.net";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  other: {
+    "impact-site-verification": "3f493339-fce3-46db-83d2-4a9d605f99e6",
+  },
   title: {
     default: "Pluckly | Tools for creators, tested and compared",
     template: "%s | Pluckly",
