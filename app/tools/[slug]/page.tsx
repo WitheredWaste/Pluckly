@@ -71,6 +71,21 @@ function faviconFromUrl(websiteUrl: string | null): string | null {
   }
 }
 
+type Faq = { q: string; a: string };
+
+function parseFaqs(value: string | null): Faq[] {
+  if (!value) return [];
+  try {
+    const arr = JSON.parse(value) as { q?: string; a?: string }[];
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter((f) => f && typeof f.q === "string" && typeof f.a === "string" && f.q.trim() && f.a.trim())
+      .map((f) => ({ q: String(f.q).trim(), a: String(f.a).trim() }));
+  } catch {
+    return [];
+  }
+}
+
 function toLines(value: string | null): string[] {
   if (!value) return [];
   return value
@@ -111,6 +126,7 @@ export default async function ToolPage({ params }: PageProps) {
   const pros = toLines(tool.pros);
   const cons = toLines(tool.cons);
   const useCases = toLines(tool.useCases);
+  const faqs = parseFaqs(tool.faqs);
 
   const initial = (tool.name?.[0] ?? "?").toUpperCase();
   const logoSrc = tool.logoUrl || faviconFromUrl(tool.websiteUrl);
@@ -309,6 +325,30 @@ export default async function ToolPage({ params }: PageProps) {
         </section>
       )}
 
+      {faqs.length > 0 && (
+        <section className="mt-16 border-t border-border pt-12">
+          <JsonLd
+            data={{
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": faqs.map((f) => ({
+                "@type": "Question",
+                "name": f.q,
+                "acceptedAnswer": { "@type": "Answer", "text": f.a },
+              })),
+            }}
+          />
+          <h2 className="font-serif text-2xl">Frequently asked questions</h2>
+          <div className="mt-6 space-y-6">
+            {faqs.map((f, idx) => (
+              <div key={idx}>
+                <h3 className="font-medium text-foreground">{f.q}</h3>
+                <p className="mt-2 text-foreground/90">{f.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
       <section className="mt-16 border-t border-border pt-12">
         <h2 className="font-serif text-2xl">Looking at alternatives?</h2>
         <p className="mt-4">

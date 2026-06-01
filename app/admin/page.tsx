@@ -1,6 +1,19 @@
 "use client";
 
 import { useState } from "react";
+function faqsJsonToText(json: string): string {
+  if (!json) return "";
+  try {
+    const arr = JSON.parse(json) as { q?: string; a?: string }[];
+    if (!Array.isArray(arr)) return "";
+    return arr
+      .filter((f) => f && f.q && f.a)
+      .map((f) => "Q: " + String(f.q).trim() + "\nA: " + String(f.a).trim())
+      .join("\n\n");
+  } catch {
+    return "";
+  }
+}
 
 type Draft = {
   name: string;
@@ -19,6 +32,7 @@ type Draft = {
   currency: string;
   pros: string;
   cons: string;
+  faqs: string;
   features: string;
   useCases: string;
   status: string;
@@ -56,6 +70,7 @@ const BLANK: Draft = {
   currency: "USD",
   pros: "",
   cons: "",
+  faqs: "",
   features: "",
   useCases: "",
   status: "",
@@ -131,6 +146,7 @@ export default function AdminPage() {
           currency: t.currency || "USD",
           pros: t.pros || "",
           cons: t.cons || "",
+          faqs: faqsJsonToText(t.faqs || ""),
           features: t.features || "",
           useCases: t.useCases || "",
           status: t.isPublished ? "Editing a published tool." : "Editing a draft.",
@@ -194,6 +210,7 @@ export default function AdminPage() {
         currency: data.suggestedCurrency || d.currency,
         pros: data.pros || "",
         cons: data.cons || "",
+        faqs: faqsJsonToText(data.faqs || ""),
         features: data.features || "",
         useCases: data.useCases || "",
         status: "ready",
@@ -225,6 +242,7 @@ export default function AdminPage() {
           categorySlugs: d.categories.split(",").map((s) => s.trim()).filter(Boolean),
           pros: d.pros,
           cons: d.cons,
+          faqs: d.faqs,
           features: d.features,
           useCases: d.useCases,
           mode,
@@ -388,6 +406,8 @@ export default function AdminPage() {
 
                     <label style={S.label}>Use cases / who it's for (one per line)</label>
                     <textarea style={S.textarea} value={d.useCases} onChange={(e) => update(i, { useCases: e.target.value })} />
+                    <label style={S.label}>FAQs (Q: question / A: answer, blank line between)</label>
+                    <textarea style={S.textarea} value={d.faqs} onChange={(e) => update(i, { faqs: e.target.value })} />
 
                     <div style={S.btnRow}>
                       <button style={S.secondary} onClick={() => save(i, "draft")}>Save as draft</button>

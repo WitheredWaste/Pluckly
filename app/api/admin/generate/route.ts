@@ -13,6 +13,7 @@ Voice: direct, factual, present tense, Wirecutter meets Stratechery.
 Forbidden words: leading, powerful, robust, seamless, cutting-edge, revolutionary, best-in-class.
 No em-dashes. No exclamation marks. No "allows you to".
 Never call a tool "the best" or "#1". Be honest in cons; real tools have real weaknesses.
+- FAQs: write 4-6 question-and-answer pairs a real buyer would search. Mix pricing, free tier, alternatives, who it suits, and one honest limitation. Questions natural and specific to this tool (use its name). Answers 1-3 sentences, factual, same voice. No "allows you to", no em-dashes, no exclamation marks.
 `;
 
 export async function POST(request: Request) {
@@ -61,6 +62,7 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
   "cons": ["...", "..."],
   "features": ["...", "..."],
   "useCases": ["...", "..."],
+  "faqs": [{ "q": "question text", "a": "answer text" }],
   "priceNote": "A short reminder of what price figure to verify before publishing."
 }`;
 
@@ -74,7 +76,7 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 2000,
+        max_tokens: 3000,
         system: VOICE_RULES,
         messages: [{ role: "user", content: userPrompt }],
       }),
@@ -112,6 +114,13 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
     parsed.cons = toLines(parsed.cons);
     parsed.features = toLines(parsed.features);
     parsed.useCases = toLines(parsed.useCases);
+    parsed.faqs = Array.isArray(parsed.faqs)
+      ? JSON.stringify(
+          parsed.faqs
+            .filter((f: { q?: string; a?: string }) => f && f.q && f.a)
+            .map((f: { q: string; a: string }) => ({ q: String(f.q).trim(), a: String(f.a).trim() }))
+        )
+      : "";
 
     return NextResponse.json(parsed);
   } catch {

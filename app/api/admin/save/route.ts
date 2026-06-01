@@ -26,6 +26,29 @@ function cleanText(value: unknown): string | null {
   return t === "" ? null : t;
 }
 
+function faqsTextToJson(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const text = value.trim();
+  if (text === "") return null;
+  const blocks = text.split(/\n\s*\n/);
+  const pairs: { q: string; a: string }[] = [];
+  for (const block of blocks) {
+    const lines = block.split("\n");
+    let q = "";
+    let a = "";
+    for (const line of lines) {
+      const qm = line.match(/^\s*Q:\s*(.*)$/i);
+      const am = line.match(/^\s*A:\s*(.*)$/i);
+      if (qm) q = qm[1].trim();
+      else if (am) a = am[1].trim();
+      else if (a) a += " " + line.trim();
+      else if (q) q += " " + line.trim();
+    }
+    if (q && a) pairs.push({ q, a });
+  }
+  return pairs.length ? JSON.stringify(pairs) : null;
+}
+
 export async function POST(request: Request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   const sentPassword = request.headers.get("x-admin-password");
@@ -40,7 +63,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Bad request data." }, { status: 400 });
   }
 
-  const { name, slug, tagline, description, websiteUrl, logoUrl, affiliateUrl, startingPriceDollars, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases, pricingModel, currency } = body;
+  const { name, slug, tagline, description, websiteUrl, logoUrl, affiliateUrl, startingPriceDollars, hasFreeOption, categorySlugs, mode, pros, cons, features, useCases, faqs, pricingModel, currency } = body;
 
   if (!name || !slug) {
     return NextResponse.json({ error: "Name and slug are required." }, { status: 400 });
@@ -65,6 +88,7 @@ export async function POST(request: Request) {
       cons: cleanText(cons),
       features: cleanText(features),
       useCases: cleanText(useCases),
+      faqs: faqsTextToJson(faqs),
       priceCheckedAt: new Date(),
     };
 
