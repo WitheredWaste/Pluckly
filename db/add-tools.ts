@@ -17,6 +17,8 @@ type PipelineTool = {
   isOpenSource: boolean;
   categories: string[];
   creatorTypes: string[];
+  faqs?: { q: string; a: string }[];
+  currency?: string;
 };
 
 async function run() {
@@ -28,7 +30,7 @@ async function run() {
     if (existing.length) { console.log(`• skip (exists): ${t.slug}`); continue; }
 
     const [row] = await db.insert(tools).values({
-      publishedAt: new Date(),
+      publishedAt: null,
       name: t.name, slug: t.slug, tagline: t.tagline,
       description: t.description, websiteUrl: t.websiteUrl,
       affiliateUrl: t.affiliateUrl ?? null,
@@ -37,6 +39,8 @@ async function run() {
       startingPriceCents: t.startingPriceCents ?? null,
       hasFreeOption: t.hasFreeOption,
       isOpenSource: t.isOpenSource,
+      currency: t.currency ?? "USD",
+      faqs: Array.isArray(t.faqs) && t.faqs.length ? JSON.stringify(t.faqs.filter((f) => f && f.q && f.a).map((f) => ({ q: String(f.q).trim(), a: String(f.a).trim() }))) : null,
     }).returning({ id: tools.id });
 
     for (const slug of t.categories) {
