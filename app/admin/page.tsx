@@ -220,6 +220,30 @@ export default function AdminPage() {
     }
   }
 
+  async function generateFaqs(i: number) {
+    const d = queue[i];
+    update(i, { status: "generating FAQs..." });
+    try {
+      const res = await fetch("/api/admin/generate-faqs", {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify({
+          name: d.name,
+          websiteUrl: d.websiteUrl,
+          roughPrice: d.roughPrice,
+          hasFreeOption: d.hasFreeOption,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        update(i, { status: data.error || "Error generating FAQs." });
+        return;
+      }
+      update(i, { faqs: faqsJsonToText(data.faqs || ""), status: "ready" });
+    } catch {
+      update(i, { status: "Network error." });
+    }
+  }
   async function save(i: number, mode: "draft" | "publish") {
     const d = queue[i];
     update(i, { status: mode === "publish" ? "publishing..." : "saving..." });
@@ -408,6 +432,7 @@ export default function AdminPage() {
                     <textarea style={S.textarea} value={d.useCases} onChange={(e) => update(i, { useCases: e.target.value })} />
                     <label style={S.label}>FAQs (Q: question / A: answer, blank line between)</label>
                     <textarea style={S.textarea} value={d.faqs} onChange={(e) => update(i, { faqs: e.target.value })} />
+                    <button style={S.secondary} onClick={() => generateFaqs(i)} disabled={!d.name}>Generate FAQs only</button>
 
                     <div style={S.btnRow}>
                       <button style={S.secondary} onClick={() => save(i, "draft")}>Save as draft</button>
