@@ -341,7 +341,7 @@ export default async function ToolPage({ params }: PageProps) {
           <h2 className="font-serif text-2xl">Frequently asked questions</h2>
           <div className="mt-6 space-y-6">
             {faqs.map((f, idx) => (
-              <div key={idx}>
+              <div key={idx} className="rounded-lg border border-border bg-foreground/[0.02] p-5">
                 <h3 className="font-medium text-foreground">{f.q}</h3>
                 <p className="mt-2 text-foreground/90">{f.a}</p>
               </div>
