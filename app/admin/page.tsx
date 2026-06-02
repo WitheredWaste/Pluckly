@@ -533,7 +533,7 @@ function NavItem(props: { label: string; active: boolean; onClick: () => void })
 function Stat(props: { label: string; value: number; highlight?: boolean }) {
   return (
     <div style={S.statCard}>
-      <div style={{ ...S.statValue, color: props.highlight ? "#b45309" : "#1c1917" }}>{props.value}</div>
+      <div style={{ ...S.statValue, color: props.highlight ? "var(--accent)" : "var(--foreground)" }}>{props.value}</div>
       <div style={S.statLabel}>{props.label}</div>
     </div>
   );
