@@ -84,3 +84,21 @@ export const toolCreatorTypes = pgTable(
     pk: primaryKey({ columns: [table.toolId, table.creatorTypeId] }),
   })
 );
+
+// Articles: long-form guides and roundups. Drafts until publishedAt is set.
+export const articles = pgTable("articles", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  subtitle: text("subtitle"),
+  excerpt: text("excerpt"),
+  metaDescription: text("meta_description"),
+  body: text("body"),
+  heroImageUrl: text("hero_image_url"),
+  relatedToolSlugs: text("related_tool_slugs"),
+  relatedArticleSlugs: text("related_article_slugs"),
+  generationMode: text("generation_mode"),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
