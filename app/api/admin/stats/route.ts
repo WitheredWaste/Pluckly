@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAuthed } from "../_auth";
 import { db } from "@/db/index";
 import { tools, categories, toolCategories } from "@/db/schema";
 
@@ -7,10 +8,8 @@ type CatRow = { id: number; name: string; slug: string };
 type LinkRow = { categoryId: number };
 
 export async function POST(request: Request) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const sentPassword = request.headers.get("x-admin-password");
-  if (!adminPassword || sentPassword !== adminPassword) {
-    return NextResponse.json({ error: "Wrong password." }, { status: 401 });
+  if (!(await isAuthed(request))) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   const allTools: ToolStatRow[] = await db

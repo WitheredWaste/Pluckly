@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAuthed } from "../_auth";
 
 type ContentBlock = { type: string; text?: string };
 
@@ -14,10 +15,8 @@ No em-dashes. No exclamation marks. No "allows you to". Never call a tool "the b
 `;
 
 export async function POST(request: Request) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const sentPassword = request.headers.get("x-admin-password");
-  if (!adminPassword || sentPassword !== adminPassword) {
-    return NextResponse.json({ error: "Wrong password." }, { status: 401 });
+  if (!(await isAuthed(request))) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   const body = await request.json();

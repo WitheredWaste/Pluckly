@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAuthed } from "../_auth";
 import { db } from "@/db/index";
 import { tools, categories, toolCategories } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -50,10 +51,8 @@ function faqsTextToJson(value: unknown): string | null {
 }
 
 export async function POST(request: Request) {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  const sentPassword = request.headers.get("x-admin-password");
-  if (!adminPassword || sentPassword !== adminPassword) {
-    return NextResponse.json({ error: "Wrong password." }, { status: 401 });
+  if (!(await isAuthed(request))) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   let body;

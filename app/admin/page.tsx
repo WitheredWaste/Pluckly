@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 function faqsJsonToText(json: string): string {
   if (!json) return "";
   try {
@@ -81,6 +81,7 @@ type Section = "overview" | "add" | "drafts" | "all";
 export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [unlocked, setUnlocked] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const [section, setSection] = useState<Section>("overview");
 
   const [queue, setQueue] = useState<Draft[]>([{ ...BLANK }]);
@@ -89,8 +90,41 @@ export default function AdminPage() {
   const [loadingMsg, setLoadingMsg] = useState("");
 
   function authHeaders() {
-    return { "Content-Type": "application/json", "x-admin-password": password };
+    return { "Content-Type": "application/json" };
   }
+  async function doLogin() {
+    setLoginError("");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setUnlocked(true);
+        setPassword("");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setLoginError(data.error || "Wrong password.");
+      }
+    } catch {
+      setLoginError("Network error. Try again.");
+    }
+  }
+  async function doLogout() {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+    } catch {}
+    setUnlocked(false);
+  }
+  useEffect(() => {
+    let active = true;
+    fetch("/api/admin/session", { method: "POST", headers: { "Content-Type": "application/json" } })
+      .then((r) => r.json())
+      .then((d) => { if (active && d.authed) setUnlocked(true); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   async function loadStats() {
     setLoadingMsg("Loading stats...");
@@ -300,9 +334,10 @@ export default function AdminPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            onKeyDown={(e) => e.key === "Enter" && setUnlocked(true)}
+            onKeyDown={(e) => e.key === "Enter" && doLogin()}
           />
-          <button style={S.primary} onClick={() => setUnlocked(true)}>Enter</button>
+          {loginError && <p style={S.muted}>{loginError}</p>}
+          <button style={S.primary} onClick={() => doLogin()}>Enter</button>
         </div>
       </div>
     );
@@ -316,6 +351,7 @@ export default function AdminPage() {
         <NavItem label="Add content" active={section === "add"} onClick={() => setSection("add")} />
         <NavItem label="Drafts" active={section === "drafts"} onClick={() => { setSection("drafts"); loadTools(); }} />
         <NavItem label="All tools" active={section === "all"} onClick={() => { setSection("all"); loadTools(); }} />
+        <button style={S.linkBtn} onClick={() => doLogout()}>Log out</button>
       </div>
 
       <div style={S.main}>
