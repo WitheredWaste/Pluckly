@@ -571,6 +571,6 @@ const S: Record<string, React.CSSProperties> = {
   status: { marginTop: 14, fontSize: 14, fontWeight: 600, color: "var(--accent)" },
   statRow: { display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap" },
   statCard: { flex: 1, minWidth: 120, border: "1px solid var(--border)", padding: "16px 18px", background: "var(--card)" },
-  statValue: { fontSize: 28, fontWeight: 700 },
+  statValue: { fontSize: 28, fontWeight: 700, color: "var(--foreground)" },
   statLabel: { fontSize: 13, color: "var(--muted)", marginTop: 4 },
 };
