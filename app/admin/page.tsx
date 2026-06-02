@@ -374,7 +374,7 @@ export default function AdminPage() {
                 {stats.byCategory.map((c) => (
                   <div key={c.slug} style={S.priceRow}>
                     <span>{c.name}</span>
-                    <span style={{ fontWeight: 600, color: c.count === 0 ? "#b45309" : "#1c1917" }}>{c.count}</span>
+                    <span style={{ fontWeight: 600, color: c.count === 0 ? "var(--accent)" : "var(--foreground)" }}>{c.count}</span>
                   </div>
                 ))}
               </div>
@@ -506,7 +506,7 @@ export default function AdminPage() {
                         {t.name}
                         {!t.publishedAt && <span style={S.draftTag}>DRAFT</span>}
                       </span>
-                      <span style={{ color: staleP ? "#b45309" : "#78716c", fontSize: 13 }}>
+                      <span style={{ color: staleP ? "var(--accent)" : "var(--muted)", fontSize: 13 }}>
                         {dd === null ? "never checked" : dd + " days ago"}{staleP ? "  re-check" : ""}
                       </span>
                     </button>
