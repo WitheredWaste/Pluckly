@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       cons: tool.cons || "",
       features: tool.features || "",
       useCases: tool.useCases || "",
+      faqs: tool.faqs || "",
       isPublished: !!tool.publishedAt,
     },
   });
