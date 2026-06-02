@@ -76,7 +76,7 @@ const BLANK: Draft = {
   status: "",
 };
 
-type Section = "overview" | "add" | "drafts" | "all";
+type Section = "overview" | "add" | "drafts" | "all" | "articles";
 
 export default function AdminPage() {
   const [password, setPassword] = useState("");
@@ -88,6 +88,70 @@ export default function AdminPage() {
   const [toolList, setToolList] = useState<ToolListItem[] | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loadingMsg, setLoadingMsg] = useState("");
+
+  // --- articles feature ---
+  type ArticleTopic = { title: string; recency: string; coverage: string; seoRationale: string };
+  type ArticleDraft = {
+    title: string; subtitle: string; excerpt: string; metaDescription: string;
+    slug: string; body: string; relatedToolSlugs: string;
+  };
+  const BLANK_ARTICLE: ArticleDraft = { title: "", subtitle: "", excerpt: "", metaDescription: "", slug: "", body: "", relatedToolSlugs: "" };
+  const [artTopicInput, setArtTopicInput] = useState("");
+  const [artTopics, setArtTopics] = useState<ArticleTopic[] | null>(null);
+  const [artDraft, setArtDraft] = useState<ArticleDraft>({ ...BLANK_ARTICLE });
+  const [artStatus, setArtStatus] = useState("");
+
+  async function suggestTopics() {
+    setArtStatus("Researching latest creator-tool news...");
+    setArtTopics(null);
+    try {
+      const res = await fetch("/api/admin/generate-article", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ action: "suggest" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setArtStatus(data.error || "Could not get suggestions."); return; }
+      setArtTopics(Array.isArray(data.topics) ? data.topics : []);
+      setArtStatus("");
+    } catch { setArtStatus("Network error getting suggestions."); }
+  }
+
+  async function writeArticle(topic: string, useSearch: boolean) {
+    if (!topic.trim()) { setArtStatus("Enter a topic first."); return; }
+    setArtStatus("Writing article...");
+    try {
+      const res = await fetch("/api/admin/generate-article", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ action: "write", topic, useSearch }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setArtStatus(data.error || "Could not write article."); return; }
+      setArtDraft({
+        title: data.title || "", subtitle: data.subtitle || "", excerpt: data.excerpt || "",
+        metaDescription: data.metaDescription || "", slug: data.suggestedSlug || "",
+        body: data.body || "",
+        relatedToolSlugs: Array.isArray(data.relatedToolSlugs) ? data.relatedToolSlugs.join(", ") : "",
+      });
+      setArtStatus("Article ready. Review, then save as draft or publish.");
+    } catch { setArtStatus("Network error writing article."); }
+  }
+
+  function updateArt(patch: Partial<ArticleDraft>) { setArtDraft((d) => ({ ...d, ...patch })); }
+
+  async function saveArticle(mode: "draft" | "publish") {
+    if (!artDraft.title.trim()) { setArtStatus("A title is required."); return; }
+    setArtStatus(mode === "publish" ? "Publishing..." : "Saving draft...");
+    try {
+      const res = await fetch("/api/admin/save-article", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ ...artDraft, relatedToolSlugs: artDraft.relatedToolSlugs, mode, generationMode: "admin" }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setArtStatus(data.error || "Could not save."); return; }
+      setArtStatus(mode === "publish" ? "Published and live." : "Saved as draft.");
+    } catch { setArtStatus("Network error saving."); }
+  }
+
 
   function authHeaders() {
     return { "Content-Type": "application/json" };
@@ -351,6 +415,7 @@ export default function AdminPage() {
         <NavItem label="Add content" active={section === "add"} onClick={() => setSection("add")} />
         <NavItem label="Drafts" active={section === "drafts"} onClick={() => { setSection("drafts"); loadTools(); }} />
         <NavItem label="All tools" active={section === "all"} onClick={() => { setSection("all"); loadTools(); }} />
+        <NavItem label="Articles" active={section === "articles"} onClick={() => setSection("articles")} />
         <button style={S.linkBtn} onClick={() => doLogout()}>Log out</button>
       </div>
 
@@ -514,6 +579,69 @@ export default function AdminPage() {
                 })}
             {toolList && toolList.filter((t) => (section === "drafts" ? !t.publishedAt : true)).length === 0 && (
               <p style={S.muted}>{section === "drafts" ? "No drafts." : "No tools yet."}</p>
+            )}
+          </div>
+        )}
+        {section === "articles" && (
+          <div>
+            <h1 style={S.h1}>Articles</h1>
+            <p style={S.muted}>
+              Generate an article from the latest creator-tool news, or from your own topic.
+              Review it, then save as draft or publish. Articles link to tools you cover.
+            </p>
+
+            <h2 style={S.h2}>1. Generate from latest news</h2>
+            <p style={S.muted}>Pluckly researches recent news and suggests topics, ranked by SEO potential and cross-referenced against what you cover.</p>
+            <button style={S.primary} onClick={suggestTopics}>Suggest topics</button>
+            {artTopics && artTopics.length > 0 && (
+              <div style={S.reviewBox}>
+                {artTopics.map((t, idx) => (
+                  <div key={idx} style={S.card}>
+                    <div style={S.rowTop}>
+                      <strong>{t.title}</strong>
+                      <span style={S.draftTag}>{t.coverage}</span>
+                    </div>
+                    <p style={S.muted}>New: {t.recency}</p>
+                    <p style={S.muted}>SEO: {t.seoRationale}</p>
+                    <button style={S.secondary} onClick={() => writeArticle(t.title, true)}>Write this article</button>
+                  </div>
+                ))}
+              </div>
+            )}
+            {artTopics && artTopics.length === 0 && <p style={S.muted}>No topics returned. Try again.</p>}
+
+            <h2 style={S.h2}>2. Generate from my topic</h2>
+            <label style={S.label}>Topic or brief (a tool name, or what to write about)</label>
+            <input style={S.input} value={artTopicInput} onChange={(e) => setArtTopicInput(e.target.value)} placeholder="e.g. Best AI video tools for YouTubers in 2026" />
+            <div style={S.btnRow}>
+              <button style={S.secondary} onClick={() => writeArticle(artTopicInput, true)} disabled={!artTopicInput.trim()}>Write (with research)</button>
+              <button style={S.secondary} onClick={() => writeArticle(artTopicInput, false)} disabled={!artTopicInput.trim()}>Write (no research)</button>
+            </div>
+
+            {artStatus && <div style={S.status}>{artStatus}</div>}
+
+            {artDraft.title && (
+              <div style={S.card}>
+                <h2 style={S.h2}>Review article</h2>
+                <label style={S.label}>Title</label>
+                <input style={S.input} value={artDraft.title} onChange={(e) => updateArt({ title: e.target.value })} />
+                <label style={S.label}>Slug (URL)</label>
+                <input style={S.input} value={artDraft.slug} onChange={(e) => updateArt({ slug: e.target.value })} />
+                <label style={S.label}>Subtitle</label>
+                <input style={S.input} value={artDraft.subtitle} onChange={(e) => updateArt({ subtitle: e.target.value })} />
+                <label style={S.label}>Excerpt (for listings)</label>
+                <textarea style={S.textarea} value={artDraft.excerpt} onChange={(e) => updateArt({ excerpt: e.target.value })} />
+                <label style={S.label}>Meta description (SEO, under 155 chars)</label>
+                <textarea style={S.textarea} value={artDraft.metaDescription} onChange={(e) => updateArt({ metaDescription: e.target.value })} />
+                <label style={S.label}>Related tool slugs (comma separated, must be tools you cover)</label>
+                <input style={S.input} value={artDraft.relatedToolSlugs} onChange={(e) => updateArt({ relatedToolSlugs: e.target.value })} />
+                <label style={S.label}>Body (Markdown)</label>
+                <textarea style={{ ...S.textarea, minHeight: 320 }} value={artDraft.body} onChange={(e) => updateArt({ body: e.target.value })} />
+                <div style={S.btnRow}>
+                  <button style={S.primary} onClick={() => saveArticle("draft")}>Save as draft</button>
+                  <button style={S.primary} onClick={() => saveArticle("publish")}>Publish</button>
+                </div>
+              </div>
             )}
           </div>
         )}
