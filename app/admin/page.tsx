@@ -152,6 +152,38 @@ export default function AdminPage() {
     } catch { setArtStatus("Network error saving."); }
   }
 
+  // --- articles list ---
+  type ArticleListItem = { slug: string; title: string; publishedAt: string | null; updatedAt: string | null };
+  const [articleList, setArticleList] = useState<ArticleListItem[] | null>(null);
+
+  async function loadArticles() {
+    try {
+      const res = await fetch("/api/admin/list-articles", { method: "POST", headers: authHeaders() });
+      const data = await res.json();
+      if (res.ok) setArticleList(Array.isArray(data.articles) ? data.articles : []);
+    } catch { /* ignore */ }
+  }
+
+  async function loadArticleIntoEditor(slug: string) {
+    setArtStatus("Loading article...");
+    try {
+      const res = await fetch("/api/admin/get-article", {
+        method: "POST", headers: authHeaders(),
+        body: JSON.stringify({ slug }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setArtStatus(data.error || "Could not load article."); return; }
+      const a = data.article;
+      setArtDraft({
+        title: a.title || "", subtitle: a.subtitle || "", excerpt: a.excerpt || "",
+        metaDescription: a.metaDescription || "", slug: a.slug || "",
+        body: a.body || "", relatedToolSlugs: a.relatedToolSlugs || "",
+      });
+      setArtStatus(a.isPublished ? "Editing a published article." : "Editing a draft.");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch { setArtStatus("Network error loading article."); }
+  }
+
 
   function authHeaders() {
     return { "Content-Type": "application/json" };
@@ -415,7 +447,7 @@ export default function AdminPage() {
         <NavItem label="Add content" active={section === "add"} onClick={() => setSection("add")} />
         <NavItem label="Drafts" active={section === "drafts"} onClick={() => { setSection("drafts"); loadTools(); }} />
         <NavItem label="All tools" active={section === "all"} onClick={() => { setSection("all"); loadTools(); }} />
-        <NavItem label="Articles" active={section === "articles"} onClick={() => setSection("articles")} />
+        <NavItem label="Articles" active={section === "articles"} onClick={() => { setSection("articles"); loadArticles(); }} />
         <button style={S.linkBtn} onClick={() => doLogout()}>Log out</button>
       </div>
 
@@ -643,6 +675,15 @@ export default function AdminPage() {
                 </div>
               </div>
             )}
+
+            <h2 style={S.h2}>All articles <button style={S.linkBtn} onClick={loadArticles}>refresh</button></h2>
+            {articleList && articleList.length === 0 && <p style={S.muted}>No articles yet.</p>}
+            {articleList && articleList.map((a) => (
+              <button key={a.slug} style={S.toolRow} onClick={() => loadArticleIntoEditor(a.slug)}>
+                <span>{a.title}{!a.publishedAt && <span style={S.draftTag}>DRAFT</span>}</span>
+                <span style={{ color: "var(--muted)", fontSize: 13 }}>{a.publishedAt ? "published" : "draft"}</span>
+              </button>
+            ))}
           </div>
         )}
       </div>
