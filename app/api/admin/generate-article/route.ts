@@ -105,8 +105,8 @@ Return ONLY a JSON object, no markdown fences, in exactly this shape:
       const parsed = parseJson(extractText(data));
       const topics = Array.isArray(parsed.topics) ? parsed.topics : [];
       return NextResponse.json({ topics });
-    } catch {
-      return NextResponse.json({ error: "Could not get topic suggestions. Try again." }, { status: 502 });
+    } catch (e) {
+      return NextResponse.json({ error: "Suggest failed: " + (e instanceof Error ? e.message : String(e)) }, { status: 502 });
     }
   }
 
