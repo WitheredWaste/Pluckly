@@ -47,7 +47,16 @@ function extractText(data: { content?: ContentBlock[] }): string {
 
 function parseJson(raw: string) {
   const cleaned = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const first = cleaned.indexOf("{");
+    const last = cleaned.lastIndexOf("}");
+    if (first !== -1 && last !== -1 && last > first) {
+      return JSON.parse(cleaned.slice(first, last + 1));
+    }
+    throw new Error("No JSON object found in response.");
+  }
 }
 
 export async function POST(request: Request) {
@@ -89,7 +98,7 @@ Suggest 5 article topics. For each, judge:
 IMPORTANT: A tool already being covered is a REASON to cover its news, not to skip it. Only treat a topic as redundant if the SPECIFIC evergreen angle would duplicate an existing page (e.g. another generic overview). New developments are always fair game.
 - seoRationale: one short line on search/traffic potential.
 
-Return ONLY a JSON object, no markdown fences, in exactly this shape:
+Return ONLY a raw JSON object and nothing else. Do not write any text before or after it. Do not summarize your research. Begin immediately with an opening brace and end with a closing brace. Use exactly this shape:
 {
   "topics": [
     { "title": "proposed article title", "recency": "what is new and when", "coverage": "fresh-news | partial | new-territory", "seoRationale": "one line" }
