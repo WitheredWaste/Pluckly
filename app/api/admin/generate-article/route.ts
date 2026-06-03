@@ -16,7 +16,7 @@ Articles should be useful enough that a reader landing directly is satisfied.
 
 async function callClaude(opts: { system: string; userPrompt: string; useSearch: boolean; maxTokens: number }) {
   const tools_arr = opts.useSearch
-    ? [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }]
+    ? [{ type: "web_search_20250305", name: "web_search", max_uses: 2 }]
     : undefined;
   const apiResponse = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -97,7 +97,7 @@ Return ONLY a JSON object, no markdown fences, in exactly this shape:
 }`;
 
     try {
-      const { ok, data } = await callClaude({ system: VOICE_RULES, userPrompt, useSearch: true, maxTokens: 2500 });
+      const { ok, data } = await callClaude({ system: VOICE_RULES, userPrompt, useSearch: true, maxTokens: 1500 });
       if (!ok) {
         const msg = (data && data.error && data.error.message) || "Claude API error.";
         return NextResponse.json({ error: msg }, { status: 502 });
