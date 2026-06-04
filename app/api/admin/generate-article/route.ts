@@ -45,6 +45,11 @@ function extractText(data: { content?: ContentBlock[] }): string {
     .trim();
 }
 
+function stripCitations(text: string): string {
+  if (typeof text !== "string") return text;
+  return text.replace(/<cite[^>]*>/gi, "").replace(/<\/cite>/gi, "");
+}
+
 function parseJson(raw: string) {
   const cleaned = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
   try {
@@ -154,6 +159,7 @@ Return ONLY a JSON object, no markdown fences, in exactly this shape:
         return NextResponse.json({ error: msg }, { status: 502 });
       }
       const parsed = parseJson(extractText(data));
+      if (typeof parsed.body === "string") parsed.body = stripCitations(parsed.body);
       const validToolSlugs = new Set(toolList.map((t) => t.slug));
       if (Array.isArray(parsed.relatedToolSlugs)) {
         parsed.relatedToolSlugs = parsed.relatedToolSlugs.filter((s: string) => validToolSlugs.has(s));
