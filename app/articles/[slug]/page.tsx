@@ -37,14 +37,20 @@ function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function inline(s: string): string {
+function inline(s: string, toolSlugs: Set<string>): string {
   let out = escapeHtml(s);
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-  out = out.replace(/\[([^\]]+)\]\((https?:[^\s]+?)\)/g, '<a href="$2">$1</a>');
+  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, text, target) => {
+    const t = String(target).trim();
+    if (/^https?:/i.test(t)) return '<a href="' + t + '">' + text + '</a>';
+    const slug = t.replace(/^\/?(tools\/)?/, "");
+    if (toolSlugs.has(slug)) return '<a href="/tools/' + slug + '">' + text + '</a>';
+    return text;
+  });
   return out;
 }
 
-function renderMarkdown(md: string): string {
+function renderMarkdown(md: string, toolSlugs: Set<string>): string {
   const lines = md.split("\n");
   const html: string[] = [];
   let inList = false;
@@ -53,16 +59,16 @@ function renderMarkdown(md: string): string {
     const line = raw.trim();
     if (line === "") { closeList(); continue; }
     if (line === "---") { closeList(); html.push("<hr />"); continue; }
-    if (line.startsWith("### ")) { closeList(); html.push(`<h3>${inline(line.slice(4))}</h3>`); continue; }
-    if (line.startsWith("## ")) { closeList(); html.push(`<h2>${inline(line.slice(3))}</h2>`); continue; }
-    if (line.startsWith("# ")) { closeList(); html.push(`<h2>${inline(line.slice(2))}</h2>`); continue; }
+    if (line.startsWith("### ")) { closeList(); html.push(`<h3>${inline(line.slice(4), toolSlugs)}</h3>`); continue; }
+    if (line.startsWith("## ")) { closeList(); html.push(`<h2>${inline(line.slice(3), toolSlugs)}</h2>`); continue; }
+    if (line.startsWith("# ")) { closeList(); html.push(`<h2>${inline(line.slice(2), toolSlugs)}</h2>`); continue; }
     if (line.startsWith("- ") || line.startsWith("* ")) {
       if (!inList) { html.push("<ul>"); inList = true; }
-      html.push(`<li>${inline(line.slice(2))}</li>`);
+      html.push(`<li>${inline(line.slice(2), toolSlugs)}</li>`);
       continue;
     }
     closeList();
-    html.push(`<p>${inline(line)}</p>`);
+    html.push(`<p>${inline(line, toolSlugs)}</p>`);
   }
   closeList();
   return html.join("\n");
@@ -80,13 +86,13 @@ export default async function ArticlePage({ params }: PageProps) {
     .map((s) => s.trim())
     .filter(Boolean);
 
-  let related: { slug: string; name: string }[] = [];
-  if (relatedSlugs.length) {
-    const all = await db.select({ slug: tools.slug, name: tools.name }).from(tools);
-    related = all.filter((t: { slug: string }) => relatedSlugs.includes(t.slug));
-  }
+  const allTools = await db.select({ slug: tools.slug, name: tools.name }).from(tools);
+  const toolSlugSet = new Set(allTools.map((t: { slug: string }) => t.slug));
+  const related = relatedSlugs.length
+    ? allTools.filter((t: { slug: string }) => relatedSlugs.includes(t.slug))
+    : [];
 
-  const bodyHtml = renderMarkdown(article.body || "");
+  const bodyHtml = renderMarkdown(article.body || "", toolSlugSet);
 
   return (
     <div className="max-w-2xl mx-auto px-6 py-16">
