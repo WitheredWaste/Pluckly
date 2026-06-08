@@ -310,9 +310,9 @@ export default function AdminPage() {
     setQueue((q) => q.filter((_, idx) => idx !== i));
   }
 
-  async function generate(i: number) {
+  async function generate(i: number, useSearch: boolean = false) {
     const d = queue[i];
-    update(i, { status: "generating" });
+    update(i, { status: useSearch ? "researching..." : "generating" });
     try {
       const res = await fetch("/api/admin/generate", {
         method: "POST",
@@ -322,6 +322,7 @@ export default function AdminPage() {
           websiteUrl: d.websiteUrl,
           roughPrice: d.roughPrice,
           hasFreeOption: d.hasFreeOption,
+          useSearch,
         }),
       });
       const data = await res.json();
@@ -515,7 +516,8 @@ export default function AdminPage() {
                 <label style={S.label}>Category slugs (comma separated). Claude suggests these; edit freely.</label>
                 <input style={S.input} value={d.categories} onChange={(e) => update(i, { categories: e.target.value })} />
 
-                <button style={S.primary} onClick={() => generate(i)} disabled={!d.name}>Generate writing</button>
+                <button style={S.primary} onClick={() => generate(i, false)} disabled={!d.name}>Generate writing</button>
+                <button style={S.secondary} onClick={() => generate(i, true)} disabled={!d.name}>Generate with research</button>
 
                 {d.status === "generating" && <p style={S.muted}>Generating...</p>}
 

@@ -17,13 +17,15 @@ Never call a tool "the best" or "#1". Be honest in cons; real tools have real we
 - FAQs: write 4-6 question-and-answer pairs a real buyer would search. Mix pricing, free tier, alternatives, who it suits, and one honest limitation. Questions natural and specific to this tool (use its name). Answers 1-3 sentences, factual, same voice. No "allows you to", no em-dashes, no exclamation marks.
 `;
 
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   if (!(await isAuthed(request))) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   const body = await request.json();
-  const { name, websiteUrl, roughPrice, hasFreeOption } = body;
+  const { name, websiteUrl, roughPrice, hasFreeOption, useSearch } = body;
 
   if (!name) {
     return NextResponse.json({ error: "Tool name is required." }, { status: 400 });
@@ -37,7 +39,10 @@ export async function POST(request: Request) {
     validSlugs = [];
   }
 
-  const userPrompt = `Write Pluckly content for this tool.
+  const searchNote = useSearch
+    ? `First, search the web for the current official pricing and latest features of this tool (today is ${new Date().toISOString().slice(0, 10)}). Prioritise the official product site over third-party sources. If pricing is unclear, say so in priceNote rather than guessing.\n\n`
+    : "";
+  const userPrompt = searchNote + `Write Pluckly content for this tool.
 
 Tool name: ${name}
 Website: ${websiteUrl || "unknown"}
@@ -75,9 +80,10 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 3000,
+        max_tokens: useSearch ? 3800 : 3000,
         system: VOICE_RULES,
         messages: [{ role: "user", content: userPrompt }],
+        ...(useSearch ? { tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 2 }] } : {}),
       }),
     });
 
@@ -100,7 +106,14 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
     try {
       parsed = JSON.parse(cleaned);
     } catch {
-      return NextResponse.json({ error: "Claude did not return clean JSON. Try Generate again." }, { status: 502 });
+      const first = cleaned.indexOf("{");
+      const last = cleaned.lastIndexOf("}");
+      if (first !== -1 && last !== -1 && last > first) {
+        try { parsed = JSON.parse(cleaned.slice(first, last + 1)); }
+        catch { return NextResponse.json({ error: "Claude did not return clean JSON. Try Generate again." }, { status: 502 }); }
+      } else {
+        return NextResponse.json({ error: "Claude did not return clean JSON. Try Generate again." }, { status: 502 });
+      }
     }
 
     if (Array.isArray(parsed.suggestedCategories) && validSlugs.length) {
