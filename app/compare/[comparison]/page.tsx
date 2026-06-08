@@ -62,6 +62,17 @@ function freeStatus(hasFreeTier: boolean, hasFreeTrial: boolean): string {
   return "Paid only";
 }
 
+function topItems(text: string | null, n: number): string[] {
+  if (!text) return [];
+  return text.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, n);
+}
+
+function fmtDate(d: Date | null): string {
+  if (!d) return "";
+  try { return new Date(d).toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" }); }
+  catch { return ""; }
+}
+
 export default async function ComparisonPage({ params }: PageProps) {
   const { comparison } = await params;
   const parsed = parseComparison(comparison);
@@ -92,6 +103,18 @@ export default async function ComparisonPage({ params }: PageProps) {
     .from(toolCategories)
     .innerJoin(categories, eq(toolCategories.categoryId, categories.id))
     .where(eq(toolCategories.toolId, tool2.id));
+
+  const cats1 = tool1Cats.map(({ category }) => category.name);
+  const cats2 = tool2Cats.map(({ category }) => category.name);
+  const sharedCats = cats1.filter((c) => cats2.includes(c));
+  const overlap = sharedCats.length > 0;
+
+  const bestFor1 = cats1.length ? cats1.slice(0, 2).join(" and ").toLowerCase() : "its core use case";
+  const bestFor2 = cats2.length ? cats2.slice(0, 2).join(" and ").toLowerCase() : "its core use case";
+
+  const framing = overlap
+    ? `${tool1.name} and ${tool2.name} both cover ${sharedCats.join(", ").toLowerCase()}, so this is a real either-or for some creators. The right pick depends on which one's wider feature set and pricing fit how you work.`
+    : `${tool1.name} and ${tool2.name} solve different problems, so most creators would not choose between them directly. The comparison below helps if you are weighing where to spend budget, or deciding whether you need both.`;
 
   const rows = [
     {
@@ -224,26 +247,51 @@ export default async function ComparisonPage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="mt-16 border-t border-border pt-12">
+      <section className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 best-for-grid">
+        <div className="border border-border p-6">
+          <div className="text-xs uppercase tracking-wide text-muted">Choose</div>
+          <div className="font-serif text-xl mt-1">{tool1.name}</div>
+          <p className="mt-3 text-sm text-foreground/90 leading-relaxed">
+            if you need {bestFor1}. {tool1.hasFreeTier ? "It has a usable free tier to start with." : "Starts at " + formatPrice(tool1.startingPriceCents).toLowerCase() + "."}
+          </p>
+          {topItems(tool1.pros, 3).length > 0 && (
+            <ul className="mt-4 space-y-1.5">
+              {topItems(tool1.pros, 3).map((pro, i) => (
+                <li key={i} className="text-sm text-foreground/80 flex gap-2"><span className="text-accent">+</span>{pro}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="border border-border p-6">
+          <div className="text-xs uppercase tracking-wide text-muted">Choose</div>
+          <div className="font-serif text-xl mt-1">{tool2.name}</div>
+          <p className="mt-3 text-sm text-foreground/90 leading-relaxed">
+            if you need {bestFor2}. {tool2.hasFreeTier ? "It has a usable free tier to start with." : "Starts at " + formatPrice(tool2.startingPriceCents).toLowerCase() + "."}
+          </p>
+          {topItems(tool2.pros, 3).length > 0 && (
+            <ul className="mt-4 space-y-1.5">
+              {topItems(tool2.pros, 3).map((pro, i) => (
+                <li key={i} className="text-sm text-foreground/80 flex gap-2"><span className="text-accent">+</span>{pro}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-12 border-t border-border pt-12">
         <h2 className="font-serif text-2xl">Which to choose</h2>
+        <p className="mt-4 text-foreground/90 leading-relaxed">{framing}</p>
         <p className="mt-4 text-foreground/90 leading-relaxed">
-          Full editorial comparison coming soon. For now, check the side-by-side
-          data above and read the individual reviews for{" "}
-          <Link
-            href={`/tools/${tool1.slug}`}
-            className="text-accent hover:underline"
-          >
-            {tool1.name}
-          </Link>{" "}
+          Read the full reviews for{" "}
+          <Link href={`/tools/${tool1.slug}`} className="text-accent hover:underline">{tool1.name}</Link>{" "}
           and{" "}
-          <Link
-            href={`/tools/${tool2.slug}`}
-            className="text-accent hover:underline"
-          >
-            {tool2.name}
-          </Link>
-          .
+          <Link href={`/tools/${tool2.slug}`} className="text-accent hover:underline">{tool2.name}</Link>.
         </p>
+        {(tool1.priceCheckedAt || tool2.priceCheckedAt) && (
+          <p className="mt-6 text-xs text-muted">
+            Pricing checked {fmtDate(tool1.priceCheckedAt) || fmtDate(tool2.priceCheckedAt)}.
+          </p>
+        )}
       </section>
     </article>
   );
