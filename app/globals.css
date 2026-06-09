@@ -54,6 +54,15 @@
 
   --radius-sm: 2px;
   --radius-md: 4px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --font-mono: var(--font-geist-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
 }
 
 @layer base {
@@ -71,6 +80,14 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-serif);
     letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  body {
+    line-height: 1.6;
+  }
+  .mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 }
 
