@@ -38,7 +38,7 @@ export async function generateMetadata({
 
   return {
     title: `${tool1.name} vs ${tool2.name}`,
-    description: `Side-by-side comparison of ${tool1.name} and ${tool2.name} for content creators. Pricing, features, and who each is for.`,
+    description: `Side-by-side comparison of ${tool1.name} and ${tool2.name}. Pricing, features, and who each is for.`,
     alternates: {
       canonical: `/compare/${a}-vs-${b}`,
     },
@@ -113,8 +113,8 @@ export default async function ComparisonPage({ params }: PageProps) {
   const bestFor2 = cats2.length ? cats2.slice(0, 2).join(" and ").toLowerCase() : "its core use case";
 
   const framing = overlap
-    ? `${tool1.name} and ${tool2.name} both cover ${sharedCats.join(", ").toLowerCase()}, so this is a real either-or for some creators. The right pick depends on which one's wider feature set and pricing fit how you work.`
-    : `${tool1.name} and ${tool2.name} solve different problems, so most creators would not choose between them directly. The comparison below helps if you are weighing where to spend budget, or deciding whether you need both.`;
+    ? `${tool1.name} and ${tool2.name} both cover ${sharedCats.join(", ").toLowerCase()}, so this is a real either-or for some teams. The right pick depends on which one's wider feature set and pricing fit how you work.`
+    : `${tool1.name} and ${tool2.name} solve different problems, so most people would not choose between them directly. The comparison below helps if you are weighing where to spend budget, or deciding whether you need both.`;
 
   const rows = [
     {
@@ -146,7 +146,7 @@ export default async function ComparisonPage({ params }: PageProps) {
           "@context": "https://schema.org",
           "@type": "WebPage",
           "name": `${tool1.name} vs ${tool2.name}: Which is Better?`,
-          "description": `Side-by-side comparison of ${tool1.name} and ${tool2.name} for content creators.`,
+          "description": `Side-by-side comparison of ${tool1.name} and ${tool2.name}.`,
           "about": [
             { "@type": "SoftwareApplication", "name": tool1.name },
             { "@type": "SoftwareApplication", "name": tool2.name },
@@ -156,16 +156,15 @@ export default async function ComparisonPage({ params }: PageProps) {
       <div className="text-sm text-muted uppercase tracking-wide">
         Comparison
       </div>
-      <h1 className="mt-2 font-serif text-5xl tracking-tight">
+      <h1 className="mt-2 font-serif text-4xl tracking-tight">
         {tool1.name} vs {tool2.name}
       </h1>
       <p className="mt-4 text-lg text-muted">
-        Side-by-side comparison of {tool1.name} and {tool2.name} for content
-        creators.
+        Side-by-side comparison of {tool1.name} and {tool2.name}.
       </p>
 
-      <div className="mt-12 border-t border-border">
-        <div className="grid grid-cols-3 gap-x-6 py-6 border-b border-border items-baseline">
+      <div className="mt-12 rounded-lg border border-border overflow-hidden bg-card">
+        <div className="grid grid-cols-3 gap-x-6 px-5 py-5 border-b border-border items-baseline">
           <div className="text-sm text-muted">Tool</div>
           <div>
             <Link
@@ -194,22 +193,22 @@ export default async function ComparisonPage({ params }: PageProps) {
         {rows.map((row) => (
           <div
             key={row.label}
-            className="grid grid-cols-3 gap-x-6 py-4 border-b border-border items-baseline"
+            className="grid grid-cols-3 gap-x-6 px-5 py-4 border-b border-border items-baseline"
           >
             <div className="text-sm text-muted">{row.label}</div>
-            <div className="text-base">{row.v1}</div>
-            <div className="text-base">{row.v2}</div>
+            <div className="mono text-sm">{row.v1}</div>
+            <div className="mono text-sm">{row.v2}</div>
           </div>
         ))}
 
-        <div className="grid grid-cols-3 gap-x-6 py-4 border-b border-border items-start">
+        <div className="grid grid-cols-3 gap-x-6 px-5 py-4 items-start">
           <div className="text-sm text-muted pt-1">Categories</div>
           <div className="flex flex-wrap gap-2">
             {tool1Cats.map(({ category }) => (
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="text-xs border border-border px-2 py-1 hover:bg-foreground/5 transition-colors"
+                className="mono text-xs border border-border px-2.5 py-1 rounded-lg hover:bg-accent/[0.06] hover:border-accent transition-colors"
               >
                 {category.name}
               </Link>
@@ -220,7 +219,7 @@ export default async function ComparisonPage({ params }: PageProps) {
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="text-xs border border-border px-2 py-1 hover:bg-foreground/5 transition-colors"
+                className="mono text-xs border border-border px-2.5 py-1 rounded-lg hover:bg-accent/[0.06] hover:border-accent transition-colors"
               >
                 {category.name}
               </Link>
@@ -248,12 +247,13 @@ export default async function ComparisonPage({ params }: PageProps) {
       </section>
 
       <section className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6 best-for-grid">
-        <div className="border border-border p-6">
+        <div className="rounded-lg border border-border bg-card p-6">
           <div className="text-xs uppercase tracking-wide text-muted">Choose</div>
           <div className="font-serif text-xl mt-1">{tool1.name}</div>
           <p className="mt-3 text-sm text-foreground/90 leading-relaxed">
             if you need {bestFor1}. {tool1.hasFreeTier ? "It has a usable free tier to start with." : "Starts at " + formatPrice(tool1.startingPriceCents).toLowerCase() + "."}
           </p>
+          {/* t1pros */}
           {topItems(tool1.pros, 3).length > 0 && (
             <ul className="mt-4 space-y-1.5">
               {topItems(tool1.pros, 3).map((pro, i) => (
@@ -262,7 +262,7 @@ export default async function ComparisonPage({ params }: PageProps) {
             </ul>
           )}
         </div>
-        <div className="border border-border p-6">
+        <div className="rounded-lg border border-border bg-card p-6">
           <div className="text-xs uppercase tracking-wide text-muted">Choose</div>
           <div className="font-serif text-xl mt-1">{tool2.name}</div>
           <p className="mt-3 text-sm text-foreground/90 leading-relaxed">
