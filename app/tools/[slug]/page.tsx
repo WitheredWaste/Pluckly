@@ -160,32 +160,30 @@ export default async function ToolPage({ params }: PageProps) {
         <div className="text-sm text-accent uppercase tracking-wide">
           Tool review
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-4">
+        <div className="mt-3 flex items-center gap-4">
           {logoSrc ? (
             <img
               src={logoSrc}
               alt={`${tool.name} logo`}
-              className="w-12 h-12 rounded-md border border-border bg-card object-contain p-1"
+              className="w-12 h-12 rounded-md border border-border bg-card object-contain p-1 shrink-0"
             />
           ) : (
-            <div className="w-12 h-12 rounded-md border border-border bg-card flex items-center justify-center font-serif text-xl text-accent">
+            <div className="w-12 h-12 rounded-md border border-border bg-card flex items-center justify-center font-serif text-xl text-accent shrink-0">
               {initial}
             </div>
           )}
-          <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-4xl tracking-tight">{tool.name}</h1>
-          </div>
-          {tool.websiteUrl && (
+          <h1 className="font-serif text-3xl sm:text-4xl tracking-tight break-words min-w-0">{tool.name}</h1>
+        </div>
+        {tool.websiteUrl && (
             <a
               href={tool.affiliateUrl || tool.websiteUrl || "#"}
               target="_blank"
               rel={tool.affiliateUrl ? "noopener noreferrer sponsored" : "noopener noreferrer"}
-              className="shrink-0 text-sm font-medium bg-accent text-white px-5 h-11 inline-flex items-center rounded-lg hover:bg-accent-hover transition-colors"
-            >
-              Visit site &#8599;
-            </a>
-          )}
-        </div>
+              className="mt-5 w-full sm:w-auto justify-center text-sm font-medium bg-accent text-white px-5 h-11 inline-flex items-center rounded-lg hover:bg-accent-hover transition-colors"
+          >
+            Visit site &#8599;
+          </a>
+        )}
         {tool.tagline && (
           <div className="mt-6 rounded-lg border border-border bg-card border-l-[3px] border-l-accent p-4">
             <div className="mono text-[11px] uppercase tracking-wider text-accent">The bottom line</div>
