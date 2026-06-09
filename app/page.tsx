@@ -4,8 +4,8 @@ import { desc, isNotNull, sql } from "drizzle-orm";
 import { db, tools, categories } from "@/db";
 
 export const metadata = {
-  title: "Best Tools for Content Creators",
-  description: "Find, compare, and choose the best tools for YouTubers, podcasters, newsletter writers, streamers, and course creators.",
+  title: "Pluckly — Independent tool reviews and comparisons",
+  description: "Pluckly reviews and compares software and tools so you can choose well. Independent, with no paid placements and nothing ranked for sale.",
 };
 
 export const revalidate = 60;
@@ -15,7 +15,7 @@ function formatPrice(cents: number | null): string {
   if (cents === 0) return "Free";
   const dollars = cents / 100;
   const display = dollars % 1 === 0 ? dollars.toString() : dollars.toFixed(2);
-  return `From $${display}/mo`;
+  return `$${display}/mo`;
 }
 
 function faviconFromUrl(websiteUrl: string | null): string | null {
@@ -56,7 +56,7 @@ export default async function Home() {
           "@type": "WebSite",
           "name": "Pluckly",
           "url": process.env.NEXT_PUBLIC_SITE_URL ?? "https://pluckly.net",
-          "description": "Find, compare, and choose the best tools for content creators.",
+          "description": "Independent reviews and comparisons of software and tools.",
           "potentialAction": {
             "@type": "SearchAction",
             "target": `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://pluckly.net"}/tools?q={search_term_string}`,
@@ -65,13 +65,13 @@ export default async function Home() {
         }}
       />
       <section>
-        <h1 className="font-serif text-5xl sm:text-6xl tracking-tight leading-tight">
-          Tools for creators, tested and compared.
+        <h1 className="font-serif text-4xl sm:text-5xl tracking-tight leading-tight">
+          Find the right tool, faster.
         </h1>
-        <p className="mt-6 text-lg text-muted max-w-2xl">
-          Pluckly is an independent review site covering software and AI tools
-          for YouTubers, podcasters, newsletter writers, and other online creators.
-          No sponsored placements, no rankings for sale.
+        <p className="mt-6 text-lg text-muted max-w-2xl leading-relaxed">
+          Pluckly reviews and compares tools so you can choose well without the
+          guesswork. Independent, with no paid placements and nothing ranked for
+          sale.
         </p>
       </section>
 
@@ -82,49 +82,60 @@ export default async function Home() {
             href="/tools"
             className="text-sm text-muted hover:text-foreground transition-colors"
           >
-            All {counts.toolCount} tools →
+            All <span className="mono">{counts.toolCount}</span> tools &rarr;
           </Link>
         </div>
-        <div className="mt-8 divide-y divide-border border-t border-border">
-          {recentTools.map((tool) => (
-            <Link
-              key={tool.id}
-              href={`/tools/${tool.slug}`}
-              className="block py-6 hover:bg-foreground/[0.02] transition-colors -mx-6 px-6"
-            >
-              <div className="flex items-baseline justify-between gap-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  {(tool.logoUrl || faviconFromUrl(tool.websiteUrl)) && (
-                    <img
-                      src={tool.logoUrl || faviconFromUrl(tool.websiteUrl) || ""}
-                      alt=""
-                      className="w-6 h-6 rounded border border-border bg-card object-contain shrink-0"
-                    />
+        <div className="mt-8 rounded-lg border border-border overflow-hidden bg-card">
+          {recentTools.map((tool, i) => {
+            const favicon = tool.logoUrl || faviconFromUrl(tool.websiteUrl);
+            const price = formatPrice(tool.startingPriceCents);
+            return (
+              <Link
+                key={tool.id}
+                href={`/tools/${tool.slug}`}
+                className={`group flex items-center gap-4 px-5 py-4 hover:bg-accent/[0.04] transition-colors ${
+                  i !== recentTools.length - 1 ? "border-b border-border" : ""
+                }`}
+              >
+                <span className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0 overflow-hidden">
+                  {favicon ? (
+                    <img src={favicon} alt="" className="w-6 h-6 object-contain" />
+                  ) : (
+                    <span className="text-accent font-medium text-base leading-none">
+                      {tool.name.charAt(0)}
+                    </span>
                   )}
-                  <h3 className="font-serif text-xl truncate">{tool.name}</h3>
-                </div>
-                <span className="text-sm text-muted shrink-0">
-                  {formatPrice(tool.startingPriceCents)}
                 </span>
-              </div>
-              {tool.tagline && (
-                <p className="mt-2 text-sm text-muted">{tool.tagline}</p>
-              )}
-            </Link>
-          ))}
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-serif text-lg truncate">{tool.name}</h3>
+                  {tool.tagline && (
+                    <p className="mt-1 text-sm text-muted truncate">{tool.tagline}</p>
+                  )}
+                </div>
+                <div className="text-right shrink-0">
+                  {price !== "Pricing varies" && (
+                    <div className="mono text-sm text-foreground">{price}</div>
+                  )}
+                  <div className="text-xs text-accent opacity-0 group-hover:opacity-100 transition-opacity">
+                    View &rarr;
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
       <section className="mt-20">
         <h2 className="font-serif text-2xl">Browse by category</h2>
-        <div className="mt-8 grid sm:grid-cols-2 gap-x-8 gap-y-4">
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3">
           {allCategories.map((category) => (
             <Link
               key={category.id}
               href={`/categories/${category.slug}`}
-              className="text-base hover:text-accent transition-colors"
+              className="rounded-lg border border-border bg-card px-4 py-3 text-sm hover:border-accent hover:bg-accent/[0.04] transition-colors"
             >
-              {category.name} →
+              {category.name}
             </Link>
           ))}
         </div>
