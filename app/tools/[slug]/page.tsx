@@ -52,7 +52,7 @@ function formatPrice(cents: number | null, currency: string | null): string {
   const symbol = CURRENCY_SYMBOLS[currency ?? "USD"] ?? "$";
   const dollars = cents / 100;
   const display = dollars % 1 === 0 ? dollars.toString() : dollars.toFixed(2);
-  return `From ${symbol}${display}/mo`;
+  return `${symbol}${display}/mo`;
 }
 
 function freeStatus(hasFreeTier: boolean, hasFreeTrial: boolean): string {
