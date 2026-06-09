@@ -710,7 +710,7 @@ function Stat(props: { label: string; value: number; highlight?: boolean }) {
   );
 }
 
-const amber = "#b45309";
+const amber = "#0D9488";
 const S: Record<string, React.CSSProperties> = {
   shell: { display: "flex", minHeight: "100vh", fontFamily: "Inter, system-ui, sans-serif", color: "var(--foreground)", background: "var(--background)" },
   sidebar: { width: 200, borderRight: "1px solid var(--border)", padding: "24px 12px", background: "var(--card)" },
