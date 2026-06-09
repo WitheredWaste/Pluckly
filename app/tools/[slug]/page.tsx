@@ -172,55 +172,51 @@ export default async function ToolPage({ params }: PageProps) {
               {initial}
             </div>
           )}
-          <h1 className="font-serif text-5xl tracking-tight">{tool.name}</h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-serif text-4xl tracking-tight">{tool.name}</h1>
+          </div>
+          {tool.websiteUrl && (
+            <a
+              href={tool.affiliateUrl || tool.websiteUrl || "#"}
+              target="_blank"
+              rel={tool.affiliateUrl ? "noopener noreferrer sponsored" : "noopener noreferrer"}
+              className="shrink-0 self-center text-sm font-medium bg-accent text-white px-5 h-11 inline-flex items-center rounded-lg hover:bg-accent-hover transition-colors"
+            >
+              Visit site &#8599;
+            </a>
+          )}
         </div>
         {tool.tagline && (
-          <p className="mt-4 text-lg text-muted">{tool.tagline}</p>
+          <div className="mt-6 rounded-lg border border-border bg-card border-l-[3px] border-l-accent p-4">
+            <div className="mono text-[11px] uppercase tracking-wider text-accent">The bottom line</div>
+            <p className="mt-1.5 text-foreground leading-relaxed">{tool.tagline}</p>
+          </div>
         )}
-        <div className="mt-5 h-0.5 w-10 bg-accent" />
       </div>
 
-      <div className="mt-8 flex flex-wrap items-stretch gap-3">
-        <div className="rounded-md border border-border bg-card px-4 py-3">
-          <div className="text-xs text-muted uppercase tracking-wide">
-            Starting price
-          </div>
-          <div className="mt-1 text-sm font-medium">
+      <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="rounded-lg bg-card border border-border px-4 py-3">
+          <div className="text-xs text-muted">Starting price</div>
+          <div className="mt-1 mono text-sm font-medium">
             {formatPrice(tool.startingPriceCents, tool.currency)}
           </div>
         </div>
         {tool.foundedYear && (
-          <div className="rounded-md border border-border bg-card px-4 py-3">
-            <div className="text-xs text-muted uppercase tracking-wide">
-              Founded
-            </div>
-            <div className="mt-1 text-sm font-medium">{tool.foundedYear}</div>
+          <div className="rounded-lg bg-card border border-border px-4 py-3">
+            <div className="text-xs text-muted">Founded</div>
+            <div className="mt-1 mono text-sm font-medium">{tool.foundedYear}</div>
           </div>
         )}
-        <div className="rounded-md border border-border bg-card px-4 py-3">
-          <div className="text-xs text-muted uppercase tracking-wide">
-            Pricing model
-          </div>
+        <div className="rounded-lg bg-card border border-border px-4 py-3">
+          <div className="text-xs text-muted">Pricing model</div>
           <div className="mt-1 text-sm font-medium capitalize">{tool.pricingModel}</div>
         </div>
-        <div className="rounded-md border border-border bg-card px-4 py-3">
-          <div className="text-xs text-muted uppercase tracking-wide">
-            Free option
-          </div>
+        <div className="rounded-lg bg-card border border-border px-4 py-3">
+          <div className="text-xs text-muted">Free option</div>
           <div className="mt-1 text-sm font-medium">
             {freeStatus(tool.hasFreeTier, tool.hasFreeTrial)}
           </div>
         </div>
-        {tool.websiteUrl && (
-          <a
-            href={tool.affiliateUrl || tool.websiteUrl || "#"}
-            target="_blank"
-            rel={tool.affiliateUrl ? "noopener noreferrer sponsored" : "noopener noreferrer"}
-            className="ml-auto self-center text-sm border border-accent text-accent px-5 h-10 inline-flex items-center rounded-md hover:bg-accent hover:text-background transition-colors"
-          >
-            Visit website
-          </a>
-        )}
       </div>
 
       {tool.description && (
@@ -251,7 +247,7 @@ export default async function ToolPage({ params }: PageProps) {
           <h2 className="font-serif text-2xl">Pros and cons</h2>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {pros.length > 0 && (
-              <div className="rounded-md border border-pros-border bg-pros-bg p-4">
+              <div className="rounded-lg border border-pros-border bg-pros-bg p-5">
                 <h3 className="text-xs uppercase tracking-wide font-medium text-pros-text">Pros</h3>
                 <ul className="mt-3 space-y-2">
                   {pros.map((p, i) => (
@@ -264,7 +260,7 @@ export default async function ToolPage({ params }: PageProps) {
               </div>
             )}
             {cons.length > 0 && (
-              <div className="rounded-md border border-cons-border bg-cons-bg p-4">
+              <div className="rounded-lg border border-cons-border bg-cons-bg p-5">
                 <h3 className="text-xs uppercase tracking-wide font-medium text-cons-text">Cons</h3>
                 <ul className="mt-3 space-y-2">
                   {cons.map((c, i) => (
@@ -302,7 +298,7 @@ export default async function ToolPage({ params }: PageProps) {
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="text-sm border border-border px-3 py-1 rounded-md hover:bg-foreground/5 transition-colors"
+                className="text-sm border border-border px-3 py-1.5 rounded-lg hover:bg-accent/[0.06] hover:border-accent transition-colors"
               >
                 {category.name}
               </Link>
