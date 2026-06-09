@@ -160,7 +160,7 @@ export default async function ToolPage({ params }: PageProps) {
         <div className="text-sm text-accent uppercase tracking-wide">
           Tool review
         </div>
-        <div className="mt-3 flex items-center gap-4">
+        <div className="mt-3 flex flex-wrap items-center gap-4">
           {logoSrc ? (
             <img
               src={logoSrc}
@@ -180,7 +180,7 @@ export default async function ToolPage({ params }: PageProps) {
               href={tool.affiliateUrl || tool.websiteUrl || "#"}
               target="_blank"
               rel={tool.affiliateUrl ? "noopener noreferrer sponsored" : "noopener noreferrer"}
-              className="shrink-0 self-center text-sm font-medium bg-accent text-white px-5 h-11 inline-flex items-center rounded-lg hover:bg-accent-hover transition-colors"
+              className="shrink-0 text-sm font-medium bg-accent text-white px-5 h-11 inline-flex items-center rounded-lg hover:bg-accent-hover transition-colors"
             >
               Visit site &#8599;
             </a>
