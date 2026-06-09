@@ -53,7 +53,7 @@ function formatPrice(cents: number | null): string {
   if (cents === 0) return "Free";
   const dollars = cents / 100;
   const display = dollars % 1 === 0 ? dollars.toString() : dollars.toFixed(2);
-  return `From $${display}/mo`;
+  return `${display}/mo`;
 }
 
 function freeStatus(hasFreeTier: boolean, hasFreeTrial: boolean): string {
