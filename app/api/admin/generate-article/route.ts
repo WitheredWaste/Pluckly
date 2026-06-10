@@ -6,7 +6,7 @@ import { tools, categories } from "@/db/schema";
 type ContentBlock = { type: string; text?: string };
 
 const VOICE_RULES = `
-You are writing for Pluckly, a directory of tools for online creators.
+You are writing for Pluckly, an independent directory that reviews and compares software and tools for any professional, business, or individual. The audience is whoever is searching for the topic, not one fixed group. Do not assume the reader is a content creator unless the specific topic is about creator tools.
 Voice: direct, factual, present tense. Wirecutter meets Stratechery.
 Forbidden words: leading, powerful, robust, seamless, cutting-edge, revolutionary, best-in-class.
 Never use em-dashes or en-dashes (the long dash characters). Use commas, colons, or separate sentences instead. This applies even when source material uses them. No exclamation marks. No "allows you to". Never call anything "the best" or "#1".
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
 
   // ACTION 1: suggest newsworthy topics, cross-referenced against coverage
   if (action === "suggest") {
-    const userPrompt = `Research the most current, genuinely recent news in the online-creator tools space (tool launches, major updates, new AI models, pricing changes, platform shifts). Search reputable sources. Today is ${new Date().toISOString().slice(0, 10)}.
+    const userPrompt = `Research the most current, genuinely recent news across the software and tools landscape (tool launches, major updates, new AI models, pricing changes, platform shifts) relevant to the categories Pluckly covers. Search reputable sources. Today is ${new Date().toISOString().slice(0, 10)}.
 
 Pluckly already has tool pages for: ${toolNames}
 Pluckly has these categories: ${catNames}
@@ -146,7 +146,7 @@ ${useSearch ? `Research current facts from reputable sources first. Today is ${n
 
 Pluckly has tool pages for these tools (use the EXACT names; suggest internal links only to tools in this list): ${toolNames}
 
-Write a magazine-quality, SEO-strong article. Structure: an engaging title, a one-sentence subtitle, a short excerpt (1-2 sentences for listings), a meta description (<=155 chars), and a body in clean Markdown with H2 subheadings and short scannable paragraphs. Open with a direct answer to the core question before the detail. Where you mention a tool we cover, note it so we can link it.
+Write a magazine-quality, SEO-strong article. Structure: an engaging title, a one-sentence subtitle, a short excerpt (1-2 sentences for listings), a meta description (<=155 chars), and a body in clean Markdown with H2 subheadings and short scannable paragraphs. Match the audience to the topic: write for whoever actually searches for this subject (an SEO-tools piece speaks to marketers, a CRM piece to sales teams, a creator-tool piece to creators). Do not add a generic "what this means for creators" angle unless the topic is genuinely about creators. Open with a direct answer to the core question before the detail. Where you mention a tool we cover, note it so we can link it.
 
 Return ONLY a JSON object, no markdown fences, in exactly this shape:
 {
