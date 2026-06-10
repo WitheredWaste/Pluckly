@@ -6,7 +6,7 @@ import { db, articles } from "@/db";
 export const metadata: Metadata = {
   title: "Articles",
   description:
-    "Guides, comparisons, and deep dives on tools and workflows for online creators.",
+    "Guides, comparisons, and deep dives on software and tools.",
   openGraph: {
     url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://pluckly.net"}/articles`,
   },
@@ -29,9 +29,9 @@ export default async function ArticlesPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-16">
       <div className="text-sm text-muted uppercase tracking-wide">Articles</div>
-      <h1 className="mt-2 font-serif text-5xl tracking-tight">Guides and deep dives</h1>
+      <h1 className="mt-2 font-serif text-4xl tracking-tight">Guides and deep dives</h1>
       <p className="mt-6 text-lg text-muted">
-        In-depth guides on tools, workflows, and strategies for online creators.
+        In-depth guides on tools, workflows, and how to choose between them.
       </p>
 
       <div className="mt-16 border-t border-border pt-12">
@@ -44,12 +44,12 @@ export default async function ArticlesPage() {
             in the meantime.
           </p>
         ) : (
-          <div className="grid gap-10">
+          <div className="grid gap-4">
             {published.map((a) => (
-              <Link key={a.slug} href={`/articles/${a.slug}`} className="group block">
-                <h2 className="font-serif text-2xl tracking-tight group-hover:text-accent">{a.title}</h2>
+              <Link key={a.slug} href={`/articles/${a.slug}`} className="group block rounded-lg border border-border bg-card p-6 hover:border-accent hover:bg-accent/[0.04] transition-colors">
+                <h2 className="font-serif text-2xl tracking-tight group-hover:text-accent transition-colors">{a.title}</h2>
                 {a.subtitle && <p className="mt-2 text-muted">{a.subtitle}</p>}
-                {a.excerpt && <p className="mt-2 text-sm text-muted leading-relaxed">{a.excerpt}</p>}
+                {a.excerpt && <p className="mt-3 text-sm text-muted leading-relaxed">{a.excerpt}</p>}
               </Link>
             ))}
           </div>

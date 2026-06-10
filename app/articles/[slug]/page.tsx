@@ -109,7 +109,7 @@ export default async function ArticlePage({ params }: PageProps) {
       <div className="text-sm text-muted uppercase tracking-wide">
         <Link href="/articles" className="hover:underline">Articles</Link>
       </div>
-      <h1 className="mt-2 font-serif text-5xl tracking-tight leading-tight">{article.title}</h1>
+      <h1 className="mt-2 font-serif text-4xl tracking-tight leading-tight">{article.title}</h1>
       {article.subtitle && <p className="mt-4 text-xl text-muted leading-relaxed">{article.subtitle}</p>}
 
       <article
