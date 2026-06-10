@@ -9,7 +9,7 @@ const VOICE_RULES = `
 You are writing for Pluckly, a directory of tools for online creators.
 Voice: direct, factual, present tense. Wirecutter meets Stratechery.
 Forbidden words: leading, powerful, robust, seamless, cutting-edge, revolutionary, best-in-class.
-No em-dashes. No exclamation marks. No "allows you to". Never call anything "the best" or "#1".
+Never use em-dashes or en-dashes (the long dash characters). Use commas, colons, or separate sentences instead. This applies even when source material uses them. No exclamation marks. No "allows you to". Never call anything "the best" or "#1".
 Be honest about tradeoffs and limitations. Write original analysis, never reword another source.
 Articles should be useful enough that a reader landing directly is satisfied.
 `;
@@ -48,6 +48,13 @@ function extractText(data: { content?: ContentBlock[] }): string {
 function stripCitations(text: string): string {
   if (typeof text !== "string") return text;
   return text.replace(/<cite[^>]*>/gi, "").replace(/<\/cite>/gi, "");
+}
+
+function stripDashes(text: string): string {
+  if (typeof text !== "string") return text;
+  return text
+    .replace(/\s+[\u2014\u2013]\s+/g, ", ")
+    .replace(/[\u2014\u2013]/g, "-");
 }
 
 function parseJson(raw: string) {
@@ -159,7 +166,9 @@ Return ONLY a JSON object, no markdown fences, in exactly this shape:
         return NextResponse.json({ error: msg }, { status: 502 });
       }
       const parsed = parseJson(extractText(data));
-      if (typeof parsed.body === "string") parsed.body = stripCitations(parsed.body);
+      for (const field of ["title", "subtitle", "excerpt", "metaDescription", "body"]) {
+        if (typeof parsed[field] === "string") parsed[field] = stripDashes(stripCitations(parsed[field]));
+      }
       const validToolSlugs = new Set(toolList.map((t) => t.slug));
       if (Array.isArray(parsed.relatedToolSlugs)) {
         parsed.relatedToolSlugs = parsed.relatedToolSlugs.filter((s: string) => validToolSlugs.has(s));
