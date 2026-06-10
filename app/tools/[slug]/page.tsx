@@ -130,6 +130,7 @@ export default async function ToolPage({ params }: PageProps) {
 
   const initial = (tool.name?.[0] ?? "?").toUpperCase();
   const logoSrc = tool.logoUrl || faviconFromUrl(tool.websiteUrl);
+  const bottomLine = (tool.verdict && tool.verdict.trim()) || tool.tagline || "";
 
   return (
     <article className="max-w-3xl mx-auto px-6 py-16">
@@ -184,10 +185,10 @@ export default async function ToolPage({ params }: PageProps) {
             Visit site &#8599;
           </a>
         )}
-        {tool.tagline && (
+        {bottomLine && (
           <div className="mt-6 rounded-lg border border-border bg-card border-l-[3px] border-l-accent p-4">
             <div className="mono text-[11px] uppercase tracking-wider text-accent">The bottom line</div>
-            <p className="mt-1.5 text-foreground leading-relaxed">{tool.tagline}</p>
+            <p className="mt-1.5 text-foreground leading-relaxed">{bottomLine}</p>
           </div>
         )}
       </div>
