@@ -52,11 +52,14 @@ Has a free option: ${hasFreeOption ? "yes" : "no"}
 Choose the most relevant categories for this tool from EXACTLY this list of valid slugs (do not invent new ones):
 ${validSlugs.join(", ") || "none available"}
 
+The verdict is one or two sentences giving the bottom line: who this tool is best for and the single most important tradeoff or caveat. Direct and decisive, the kind of line a reviewer leads with. Not a feature summary, not a restatement of the tagline.
+
 For pros, cons, features, and useCases: provide up to 6-8 items each where genuinely useful (fewer is fine if padding would be filler). Each item a short phrase or single sentence.
 
 Return ONLY a JSON object, no other text, no markdown fences, in exactly this shape:
 {
   "tagline": "...",
+  "verdict": "...",
   "description": "...",
   "suggestedSlug": "lowercase-hyphenated-version-of-name",
   "suggestedCategories": ["slug-one", "slug-two"],
@@ -128,6 +131,7 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
     const toLines = (v: unknown): string =>
       Array.isArray(v) ? v.map((x) => stripDashes(String(x).trim())).filter(Boolean).join("\n") : "";
     if (typeof parsed.tagline === "string") parsed.tagline = stripDashes(parsed.tagline);
+    if (typeof parsed.verdict === "string") parsed.verdict = stripDashes(parsed.verdict);
     if (typeof parsed.description === "string") parsed.description = stripDashes(parsed.description);
     parsed.pros = toLines(parsed.pros);
     parsed.cons = toLines(parsed.cons);

@@ -24,6 +24,7 @@ type Draft = {
   hasFreeOption: boolean;
   categories: string;
   tagline: string;
+  verdict: string;
   description: string;
   slug: string;
   priceNote: string;
@@ -62,6 +63,7 @@ const BLANK: Draft = {
   hasFreeOption: false,
   categories: "",
   tagline: "",
+  verdict: "",
   description: "",
   slug: "",
   priceNote: "",
@@ -268,6 +270,7 @@ export default function AdminPage() {
           hasFreeOption: t.hasFreeOption,
           categories: t.categories,
           tagline: t.tagline,
+          verdict: t.verdict,
           description: t.description,
           slug: t.slug,
           priceNote: "",
@@ -333,6 +336,7 @@ export default function AdminPage() {
       const suggested = Array.isArray(data.suggestedCategories) ? data.suggestedCategories.join(", ") : d.categories;
       update(i, {
         tagline: data.tagline || "",
+        verdict: data.verdict || "",
         description: data.description || "",
         slug: data.suggestedSlug || "",
         priceNote: data.priceNote || "",
@@ -386,6 +390,7 @@ export default function AdminPage() {
           name: d.name,
           slug: d.slug,
           tagline: d.tagline,
+          verdict: d.verdict,
           description: d.description,
           websiteUrl: d.websiteUrl,
           logoUrl: d.logoUrl,
@@ -521,11 +526,13 @@ export default function AdminPage() {
 
                 {d.status === "generating" && <p style={S.muted}>Generating...</p>}
 
-                {(d.tagline || d.description) ? (
+                {(d.tagline || d.verdict || d.description) ? (
                   <div style={S.reviewBox}>
                     <label style={S.label}>Tagline (editable)</label>
                     <input style={S.input} value={d.tagline} onChange={(e) => update(i, { tagline: e.target.value })} />
 
+                    <label style={S.label}>Verdict / bottom line (editable)</label>
+                    <textarea style={S.textarea} value={d.verdict} onChange={(e) => update(i, { verdict: e.target.value })} />
                     <label style={S.label}>Description (editable)</label>
                     <textarea style={S.textarea} value={d.description} onChange={(e) => update(i, { description: e.target.value })} />
 
