@@ -12,7 +12,7 @@ Voice: direct, factual, present tense, Wirecutter meets Stratechery.
 - Description: 2-4 sentences, 50-90 words. Cover what it does, who uses it, and one honest observation.
 - Pros, cons, features, useCases: each is a list. Each item is a short phrase or one sentence, no leading bullet characters.
 Forbidden words: leading, powerful, robust, seamless, cutting-edge, revolutionary, best-in-class.
-No em-dashes. No exclamation marks. No "allows you to".
+Never use em-dashes or en-dashes (the long dash characters). Use commas, colons, or separate sentences instead. This applies even when source material uses them. No exclamation marks. No "allows you to".
 Never call a tool "the best" or "#1". Be honest in cons; real tools have real weaknesses.
 - FAQs: write 4-6 question-and-answer pairs a real buyer would search. Mix pricing, free tier, alternatives, who it suits, and one honest limitation. Questions natural and specific to this tool (use its name). Answers 1-3 sentences, factual, same voice. No "allows you to", no em-dashes, no exclamation marks.
 `;
@@ -120,8 +120,15 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
       parsed.suggestedCategories = parsed.suggestedCategories.filter((s: string) => validSlugs.includes(s));
     }
 
+    const stripDashes = (v: string): string =>
+      v
+        .replace(/\s+[\u2014\u2013]\s+/g, ", ")
+        .replace(/[\u2014\u2013]/g, "-");
+
     const toLines = (v: unknown): string =>
-      Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean).join("\n") : "";
+      Array.isArray(v) ? v.map((x) => stripDashes(String(x).trim())).filter(Boolean).join("\n") : "";
+    if (typeof parsed.tagline === "string") parsed.tagline = stripDashes(parsed.tagline);
+    if (typeof parsed.description === "string") parsed.description = stripDashes(parsed.description);
     parsed.pros = toLines(parsed.pros);
     parsed.cons = toLines(parsed.cons);
     parsed.features = toLines(parsed.features);
@@ -130,7 +137,7 @@ Return ONLY a JSON object, no other text, no markdown fences, in exactly this sh
       ? JSON.stringify(
           parsed.faqs
             .filter((f: { q?: string; a?: string }) => f && f.q && f.a)
-            .map((f: { q: string; a: string }) => ({ q: String(f.q).trim(), a: String(f.a).trim() }))
+            .map((f: { q: string; a: string }) => ({ q: stripDashes(String(f.q).trim()), a: stripDashes(String(f.a).trim()) }))
         )
       : "";
 
