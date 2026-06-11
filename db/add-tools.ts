@@ -7,6 +7,7 @@ type PipelineTool = {
   name: string;
   slug: string;
   tagline: string;
+  verdict?: string;
   description: string;
   websiteUrl: string;
   affiliateUrl?: string;
@@ -32,6 +33,7 @@ async function run() {
     const [row] = await db.insert(tools).values({
       publishedAt: null,
       name: t.name, slug: t.slug, tagline: t.tagline,
+      verdict: t.verdict ?? null,
       description: t.description, websiteUrl: t.websiteUrl,
       affiliateUrl: t.affiliateUrl ?? null,
       foundedYear: t.foundedYear ?? null,
