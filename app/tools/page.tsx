@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: { url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://pluckly.net"}/tools` },
 };
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export default async function ToolsIndexPage() {
   const allTools = await db

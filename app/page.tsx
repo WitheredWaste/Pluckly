@@ -8,7 +8,7 @@ export const metadata = {
   description: "Pluckly reviews and compares software and tools so you can choose well. Independent, with no paid placements and nothing ranked for sale.",
 };
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 function formatPrice(cents: number | null): string {
   if (cents === null) return "Pricing varies";

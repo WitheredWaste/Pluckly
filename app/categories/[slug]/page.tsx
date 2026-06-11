@@ -37,7 +37,7 @@ export async function generateMetadata({
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 function formatPrice(cents: number | null): string {
   if (cents === null) return "Pricing varies";

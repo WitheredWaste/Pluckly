@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 // Minimal, safe Markdown -> HTML for the subset our articles use.
 function escapeHtml(s: string): string {
